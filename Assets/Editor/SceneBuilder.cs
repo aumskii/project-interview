@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -13,6 +16,7 @@ public static class SceneBuilder
 {
     private const string MenuPath = "Tools/Build VN Scene";
     private const string ScenePath = "Assets/VNScene.unity";
+    private const byte VisibleAlphaThreshold = 16;
 
     [MenuItem(MenuPath, true)]
     private static bool CanBuild() => !EditorApplication.isPlayingOrWillChangePlaymode;
@@ -30,6 +34,7 @@ public static class SceneBuilder
             return;
 
         TMP_FontAsset font = TMP_Settings.defaultFontAsset;
+        VisualManager.CharacterTrim[] characterTrims = ReadCharacterTrims();
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         CreateCamera();
         CreateEventSystem();
@@ -53,7 +58,7 @@ public static class SceneBuilder
         characterRect.anchorMax = bottomCenter;
         characterRect.pivot = bottomCenter;
         characterRect.anchoredPosition = Vector2.zero;
-        characterRect.sizeDelta = new Vector2(940f, 1000f);
+        characterRect.sizeDelta = scaler.referenceResolution;
         character.preserveAspect = true;
         character.enabled = false;
 
@@ -71,11 +76,14 @@ public static class SceneBuilder
         dialogue.alignment = TextAlignmentOptions.TopLeft;
         SetRect(dialogue.rectTransform, 0.03f, 0.17f, 0.97f, 0.74f);
 
+        Button back = CreateHistoryButton(panel.rectTransform, "Back Button", '◀', font, false);
+        Button forward = CreateHistoryButton(panel.rectTransform, "Forward Button", '▶', font, true);
+
         Image continueIndicator = CreateImage(panel.rectTransform, "Continue Indicator", Color.white);
         RectTransform indicatorRect = continueIndicator.rectTransform;
         indicatorRect.anchorMin = Vector2.right;
         indicatorRect.anchorMax = Vector2.right;
-        indicatorRect.anchoredPosition = new Vector2(-44f, 26f);
+        indicatorRect.anchoredPosition = new Vector2(-104f, 27f);
         indicatorRect.sizeDelta = new Vector2(13f, 13f);
         indicatorRect.localRotation = Quaternion.Euler(0f, 0f, 45f);
         continueIndicator.gameObject.SetActive(false);
@@ -97,9 +105,9 @@ public static class SceneBuilder
         choiceTemplate.gameObject.SetActive(false);
 
         var systems = new GameObject("VN Systems");
-        systems.AddComponent<VisualManager>().Configure(background, character);
+        systems.AddComponent<VisualManager>().Configure(background, character, characterTrims);
         systems.AddComponent<DialogueManager>().Configure(speaker, dialogue, choices, choiceTemplate,
-            advanceArea, continueIndicator);
+            advanceArea, continueIndicator, back, forward);
 
         if (!EditorSceneManager.SaveScene(scene, ScenePath))
         {
@@ -109,6 +117,72 @@ public static class SceneBuilder
 
         Selection.activeGameObject = systems;
         Debug.Log($"VN scene saved to {ScenePath}.", systems);
+    }
+
+    private static VisualManager.CharacterTrim[] ReadCharacterTrims()
+    {
+        TextAsset json = Resources.Load<TextAsset>(DialogueManager.DialoguePath);
+        if (json == null)
+            return Array.Empty<VisualManager.CharacterTrim>();
+
+        GameDataContainer data;
+        try
+        {
+            data = JsonUtility.FromJson<GameDataContainer>(json.text);
+        }
+        catch (ArgumentException)
+        {
+            return Array.Empty<VisualManager.CharacterTrim>();
+        }
+
+        var trims = new List<VisualManager.CharacterTrim>();
+        var checkedSprites = new HashSet<Sprite>();
+        foreach (DialogueNode node in data?.nodes ?? Array.Empty<DialogueNode>())
+        {
+            Sprite sprite = VisualManager.LoadCharacterSprite(node?.characterSprite);
+            if (sprite == null || !checkedSprites.Add(sprite))
+                continue;
+
+            string path = AssetDatabase.GetAssetPath(sprite);
+            if (!path.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                !(AssetImporter.GetAtPath(path) is TextureImporter importer) ||
+                importer.spriteImportMode != SpriteImportMode.Single)
+                continue;
+
+            float bottomFraction = ReadBottomPadding(path);
+            if (bottomFraction > 0f)
+                trims.Add(new VisualManager.CharacterTrim { sprite = sprite, bottomFraction = bottomFraction });
+        }
+
+        return trims.ToArray();
+    }
+
+    private static float ReadBottomPadding(string path)
+    {
+        var texture = new Texture2D(2, 2);
+        try
+        {
+            if (!ImageConversion.LoadImage(texture, File.ReadAllBytes(path)))
+                return 0f;
+
+            Color32[] pixels = texture.GetPixels32();
+            int width = texture.width;
+            for (int y = 0; y < texture.height; y++)
+            {
+                int row = y * width;
+                for (int x = 0; x < width; x++)
+                {
+                    if (pixels[row + x].a >= VisibleAlphaThreshold)
+                        return (float)y / texture.height;
+                }
+            }
+
+            return 0f;
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(texture);
+        }
     }
 
     private static void CreateCamera()
@@ -174,6 +248,35 @@ public static class SceneBuilder
         button.transition = Selectable.Transition.None;
         button.navigation = new Navigation { mode = Navigation.Mode.None };
         button.gameObject.SetActive(false);
+        return button;
+    }
+
+    private static Button CreateHistoryButton(Transform parent, string name, char glyph,
+        TMP_FontAsset font, bool onRight)
+    {
+        Image hitArea = CreateImage(parent, name, Color.clear);
+        hitArea.raycastTarget = true;
+        RectTransform rect = hitArea.rectTransform;
+        rect.anchorMin = rect.anchorMax = onRight ? Vector2.right : Vector2.zero;
+        rect.anchoredPosition = new Vector2(onRight ? -49f : 49f, 27f);
+        rect.sizeDelta = new Vector2(66f, 44f);
+
+        TextMeshProUGUI arrow = CreateText(rect, "Arrow", font, 32f);
+        if (!font.HasCharacter(glyph, true, true))
+            glyph = onRight ? '►' : '◄';
+        arrow.text = glyph.ToString();
+        arrow.alignment = TextAlignmentOptions.Center;
+        SetRect(arrow.rectTransform, 0f, 0f, 1f, 1f);
+
+        var button = hitArea.gameObject.AddComponent<Button>();
+        button.targetGraphic = arrow;
+        ColorBlock colors = button.colors;
+        colors.highlightedColor = new Color32(237, 214, 162, 255);
+        colors.selectedColor = colors.highlightedColor;
+        colors.disabledColor = new Color(1f, 1f, 1f, 0.24f);
+        colors.fadeDuration = 0.12f;
+        button.colors = colors;
+        button.interactable = false;
         return button;
     }
 

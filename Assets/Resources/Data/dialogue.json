@@ -6,32 +6,462 @@
       "text": "Звук будильника...",
       "background": "",
       "characterSprite": "",
-      "nextNodeId": "start",
+      "nextNodeId": "alarm_1",
       "choices": []
     },
     {
-      "id": "start",
+      "id": "alarm_1",
       "characterName": "",
-      "text": "Сегодня. Собеседование. В 14:00. Не проспать.",
+      "text": "Сегодня.",
       "background": "bg_bedroom",
       "characterSprite": "slava_home_sleepy_clean",
-      "nextNodeId": "prologue_2",
+      "nextNodeId": "alarm_2",
       "choices": []
     },
     {
-      "id": "prologue_2",
+      "id": "alarm_2",
       "characterName": "",
-      "text": "Три недели назад. «Мы вынуждены». «Не по вашей вине». «Сокращение».",
+      "text": "Собеседование.",
+      "background": "bg_bedroom",
+      "characterSprite": "slava_home_sleepy_clean",
+      "nextNodeId": "alarm_3",
+      "choices": []
+    },
+    {
+      "id": "alarm_3",
+      "characterName": "",
+      "text": "В 14:00. Не проспать.",
+      "background": "bg_bedroom",
+      "characterSprite": "slava_home_sleepy_clean",
+      "nextNodeId": "mirror_1",
+      "choices": []
+    },
+    {
+      "id": "mirror_1",
+      "characterName": "",
+      "text": "Так. Нормально.",
+      "background": "bg_mirror",
+      "characterSprite": "",
+      "nextNodeId": "mirror_2",
+      "choices": []
+    },
+    {
+      "id": "mirror_2",
+      "characterName": "",
+      "text": "Только не врать. Ну, сильно не врать.",
+      "background": "bg_mirror",
+      "characterSprite": "",
+      "nextNodeId": "mirror_3",
+      "choices": []
+    },
+    {
+      "id": "mirror_3",
+      "characterName": "",
+      "text": "Все врут на собеседованиях. Это нормально. Наверное.",
+      "background": "bg_mirror",
+      "characterSprite": "",
+      "nextNodeId": "flashback_1",
+      "choices": []
+    },
+    {
+      "id": "flashback_1",
+      "characterName": "",
+      "text": "Три недели назад.",
       "background": "bg_laptop",
       "characterSprite": "",
-      "nextNodeId": "prologue_3",
+      "nextNodeId": "flashback_2",
       "choices": []
     },
     {
-      "id": "prologue_3",
+      "id": "flashback_2",
       "characterName": "",
-      "text": "Погода сегодня… Хорошая. Может, это знак? Ну да. Конечно. Знак.",
+      "text": "«Мы вынуждены».",
+      "background": "bg_laptop",
+      "characterSprite": "",
+      "nextNodeId": "flashback_3",
+      "choices": []
+    },
+    {
+      "id": "flashback_3",
+      "characterName": "",
+      "text": "«Не по вашей вине».",
+      "background": "bg_laptop",
+      "characterSprite": "",
+      "nextNodeId": "flashback_4",
+      "choices": []
+    },
+    {
+      "id": "flashback_4",
+      "characterName": "",
+      "text": "«Сокращение».",
+      "background": "bg_laptop",
+      "characterSprite": "",
+      "nextNodeId": "mirror_return_1",
+      "choices": []
+    },
+    {
+      "id": "mirror_return_1",
+      "characterName": "",
+      "text": "Формально — сокращение. Неформально — мы просто не сошлись.",
+      "background": "bg_mirror",
+      "characterSprite": "",
+      "nextNodeId": "mirror_return_2",
+      "choices": []
+    },
+    {
+      "id": "mirror_return_2",
+      "characterName": "",
+      "text": "Ладно. Пора выходить.",
+      "background": "bg_mirror",
+      "characterSprite": "",
+      "nextNodeId": "park_1",
+      "choices": []
+    },
+    {
+      "id": "park_1",
+      "characterName": "",
+      "text": "Погода сегодня… Хорошая.",
       "background": "bg_park",
+      "characterSprite": "",
+      "nextNodeId": "park_2",
+      "choices": []
+    },
+    {
+      "id": "park_2",
+      "characterName": "",
+      "text": "Может, это знак?",
+      "background": "bg_park",
+      "characterSprite": "",
+      "nextNodeId": "park_3",
+      "choices": []
+    },
+    {
+      "id": "park_3",
+      "characterName": "",
+      "text": "Вон уже и вход в офис виднеется. Стеклянные двери, всё как положено.",
+      "background": "bg_park",
+      "characterSprite": "",
+      "nextNodeId": "lobby_1",
+      "choices": []
+    },
+    {
+      "id": "lobby_1",
+      "characterName": "",
+      "text": "Ну вот. Приехали.",
+      "background": "bg_office_entrance",
+      "characterSprite": "",
+      "nextNodeId": "lobby_2",
+      "choices": []
+    },
+    {
+      "id": "lobby_2",
+      "characterName": "",
+      "text": "Просто собеседование. Да.",
+      "background": "bg_office_entrance",
+      "characterSprite": "",
+      "nextNodeId": "reception_1",
+      "choices": []
+    },
+    {
+      "id": "reception_1",
+      "characterName": "Инга",
+      "text": "Ой, здравствуйте! Вы Слава? На 14:00? Кстати, вы видели, какая погода сегодня? Просто отличная! Солнце, птички. Значит, и собеседование у вас пройдёт хорошо. Примета такая. Ну, присаживайтесь, водички?",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Да, спасибо. Погода правда отличная — даже идти приятно было",
+          "nextNodeId": "reception_1_good",
+          "flagToSet": "weather_good"
+        },
+        {
+          "choiceText": "А если дождь — то и собеседование плохое? Так и работу выбираете?",
+          "nextNodeId": "reception_1_snark",
+          "flagToSet": "weather_snark"
+        },
+        {
+          "choiceText": "Вы всегда такая весёлая? Или только по средам?",
+          "nextNodeId": "reception_1_weird",
+          "flagToSet": "weather_weird"
+        }
+      ]
+    },
+    {
+      "id": "reception_1_good",
+      "characterName": "Инга",
+      "text": "Вот! Я же говорю — примета. Такие люди нам и нужны, которые замечают хорошее.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "reception_2",
+      "choices": []
+    },
+    {
+      "id": "reception_1_snark",
+      "characterName": "Инга",
+      "text": "Ну, всякое бывает. Я просто к тому, что день хороший. Ладно, не будем о погоде.",
+      "background": "bg_reception",
+      "characterSprite": "inga_awkward",
+      "nextNodeId": "reception_2",
+      "choices": []
+    },
+    {
+      "id": "reception_1_weird",
+      "characterName": "Инга",
+      "text": "Ха! Нет, я вообще по жизни такая. А вы, я смотрю, наблюдательный. Это хорошо.",
+      "background": "bg_reception",
+      "characterSprite": "inga_laugh",
+      "nextNodeId": "reception_2",
+      "choices": []
+    },
+    {
+      "id": "reception_2",
+      "characterName": "Инга",
+      "text": "Расскажите, а то у меня в анкете пусто: почему с прошлой работы ушли?",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Хотел расти",
+          "nextNodeId": "rec_why_grow",
+          "flagToSet": "said_grow"
+        },
+        {
+          "choiceText": "Конфликт с руководством",
+          "nextNodeId": "rec_why_conflict",
+          "flagToSet": "said_conflict"
+        },
+        {
+          "choiceText": "Сократили",
+          "nextNodeId": "rec_why_cut",
+          "flagToSet": "said_cut"
+        },
+        {
+          "choiceText": "Меня уволили",
+          "nextNodeId": "rec_why_fired",
+          "flagToSet": "said_fired"
+        }
+      ]
+    },
+    {
+      "id": "rec_why_grow",
+      "characterName": "Инга",
+      "text": "Потолок — это знакомо. У нас, кстати, потолка нет.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "reception_3",
+      "choices": []
+    },
+    {
+      "id": "rec_why_conflict",
+      "characterName": "Инга",
+      "text": "С начальниками тут… бывает сложно. Но вы держитесь.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "reception_3",
+      "choices": []
+    },
+    {
+      "id": "rec_why_cut",
+      "characterName": "Инга",
+      "text": "Ой, сочувствую. У нас тоже сокращали.",
+      "background": "bg_reception",
+      "characterSprite": "inga_awkward",
+      "nextNodeId": "reception_3",
+      "choices": []
+    },
+    {
+      "id": "rec_why_fired",
+      "characterName": "Инга",
+      "text": "Уволили. Прямо так и говорите. Смело. Главное — не врать.",
+      "background": "bg_reception",
+      "characterSprite": "inga_surprised",
+      "nextNodeId": "reception_3",
+      "choices": []
+    },
+    {
+      "id": "reception_3",
+      "characterName": "Инга",
+      "text": "А кем себя видите через пять лет? Только честно, а то все говорят «руководителем», а потом уходят.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Руководителем отдела",
+          "nextNodeId": "rec_five_boss",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Хочу работать с людьми",
+          "nextNodeId": "rec_five_people",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Живым",
+          "nextNodeId": "rec_five_alive",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Не люблю загадывать",
+          "nextNodeId": "rec_five_guess",
+          "flagToSet": ""
+        }
+      ]
+    },
+    {
+      "id": "rec_five_boss",
+      "characterName": "Инга",
+      "text": "О, амбициозно. У нас как раз отдела нет.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "reception_4",
+      "choices": []
+    },
+    {
+      "id": "rec_five_people",
+      "characterName": "Инга",
+      "text": "С людьми — это вы по адресу. Бумажек у нас тоже хватает.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "reception_4",
+      "choices": []
+    },
+    {
+      "id": "rec_five_alive",
+      "characterName": "Инга",
+      "text": "Ой, я это запишу. Нет, правда, запишу.",
+      "background": "bg_reception",
+      "characterSprite": "inga_laugh",
+      "nextNodeId": "reception_4",
+      "choices": []
+    },
+    {
+      "id": "rec_five_guess",
+      "characterName": "Инга",
+      "text": "Разумно. У нас тут планы любят ломаться.",
+      "background": "bg_reception",
+      "characterSprite": "inga_awkward",
+      "nextNodeId": "reception_4",
+      "choices": []
+    },
+    {
+      "id": "reception_4",
+      "characterName": "Инга",
+      "text": "Ладно, а со стрессом как? У нас тут, знаете, бывает… жарко.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Я стрессоустойчивый",
+          "nextNodeId": "rec_stress_proof",
+          "flagToSet": "said_stressproof"
+        },
+        {
+          "choiceText": "Пью чай",
+          "nextNodeId": "rec_stress_tea",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Кричу в подушку",
+          "nextNodeId": "rec_stress_pillow",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А что, уже начинается?",
+          "nextNodeId": "rec_stress_what",
+          "flagToSet": ""
+        }
+      ]
+    },
+    {
+      "id": "rec_stress_proof",
+      "characterName": "Инга",
+      "text": "Ну и отлично. Записала.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "reception_5",
+      "choices": []
+    },
+    {
+      "id": "rec_stress_tea",
+      "characterName": "Инга",
+      "text": "О, у нас на кухне печенье есть. Пока.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "reception_5",
+      "choices": []
+    },
+    {
+      "id": "rec_stress_pillow",
+      "characterName": "Инга",
+      "text": "Ха, стены тут тонкие, кричать лучше не надо.",
+      "background": "bg_reception",
+      "characterSprite": "inga_laugh",
+      "nextNodeId": "reception_5",
+      "choices": []
+    },
+    {
+      "id": "rec_stress_what",
+      "characterName": "Инга",
+      "text": "Ещё нет. Но вы не расслабляйтесь.",
+      "background": "bg_reception",
+      "characterSprite": "inga_surprised",
+      "nextNodeId": "reception_5",
+      "choices": []
+    },
+    {
+      "id": "reception_5",
+      "characterName": "Инга",
+      "text": "Всё, Слава, спасибо! Пройдите дальше, вас встретят. Удачи!",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "inga_warning_1",
+      "choices": []
+    },
+    {
+      "id": "inga_warning_1",
+      "characterName": "Инга",
+      "text": "Ой, Слава, погодите! Я вам это не говорила, ладно? Просто… У нас в офисе нельзя врать. Вообще. Ни охранникам, ни там, дальше. Я про директора вообще молчу. Он такое не любит.",
+      "background": "bg_reception",
+      "characterSprite": "inga_serious",
+      "nextNodeId": "inga_warning_2",
+      "choices": []
+    },
+    {
+      "id": "inga_warning_2",
+      "characterName": "Инга",
+      "text": "Всё, идите. И это… удачи. Правда.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "corridor_transition",
+      "choices": []
+    },
+    {
+      "id": "corridor_transition",
+      "characterName": "",
+      "text": "Нельзя врать? К чему это она? А что будет, если совру? Да нет. Бред. Она просто предупредила. Наверное.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "",
+      "nextNodeId": "corridor_transition_2",
+      "choices": []
+    },
+    {
+      "id": "corridor_transition_2",
+      "characterName": "",
+      "text": "Впереди турникет. У турникета стоит охранник. Не двигается. Смотрит в планшет.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "",
+      "nextNodeId": "END_OF_ACT_1",
+      "choices": []
+    },
+    {
+      "id": "END_OF_ACT_1",
+      "characterName": "",
+      "text": "",
+      "background": "bg_corridor_turnstile",
       "characterSprite": "",
       "nextNodeId": "",
       "choices": []
