@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {
+      "id": "start_alarm",
+      "characterName": "",
+      "text": "Звук будильника...",
+      "background": "",
+      "characterSprite": "",
+      "nextNodeId": "start",
+      "choices": []
+    },
+    {
+      "id": "start",
+      "characterName": "",
+      "text": "Сегодня. Собеседование. В 14:00. Не проспать.",
+      "background": "bg_bedroom",
+      "characterSprite": "slava_home_sleepy_clean",
+      "nextNodeId": "prologue_2",
+      "choices": []
+    },
+    {
+      "id": "prologue_2",
+      "characterName": "",
+      "text": "Три недели назад. «Мы вынуждены». «Не по вашей вине». «Сокращение».",
+      "background": "bg_laptop",
+      "characterSprite": "",
+      "nextNodeId": "prologue_3",
+      "choices": []
+    },
+    {
+      "id": "prologue_3",
+      "characterName": "",
+      "text": "Погода сегодня… Хорошая. Может, это знак? Ну да. Конечно. Знак.",
+      "background": "bg_park",
+      "characterSprite": "",
+      "nextNodeId": "",
+      "choices": []
+    }
+  ]
+}

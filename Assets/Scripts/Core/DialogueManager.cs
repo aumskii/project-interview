@@ -9,12 +9,14 @@ using UnityEngine.UI;
 public sealed class DialogueManager : MonoBehaviour
 {
     private const string DialoguePath = "Data/dialogue";
+    private const float IndicatorPeriod = 1.2f;
 
     [SerializeField] private TMP_Text speakerText;
     [SerializeField] private TMP_Text dialogueText;
     [SerializeField] private RectTransform choicesContainer;
     [SerializeField] private Button choiceButtonTemplate;
-    [SerializeField] private Button nextButton;
+    [SerializeField] private Button advanceArea;
+    [SerializeField] private Image continueIndicator;
     [SerializeField, Min(1f)] private float charactersPerSecond = 52f;
 
     private readonly Dictionary<string, DialogueNode> nodes =
@@ -25,44 +27,47 @@ public sealed class DialogueManager : MonoBehaviour
     private DialogueNode currentNode;
     private int lineLength;
     private float visibleCharacters;
+    private float indicatorStartedAt;
 
     public void Configure(TMP_Text speaker, TMP_Text line, RectTransform choices,
-        Button choiceTemplate, Button next)
+        Button choiceTemplate, Button advance, Image indicator)
     {
         speakerText = speaker;
         dialogueText = line;
         choicesContainer = choices;
         choiceButtonTemplate = choiceTemplate;
-        nextButton = next;
+        advanceArea = advance;
+        continueIndicator = indicator;
     }
 
     private void Start()
     {
         if (speakerText == null || dialogueText == null || choicesContainer == null ||
-            nextButton == null || choiceButtonTemplate == null ||
+            advanceArea == null || continueIndicator == null || choiceButtonTemplate == null ||
             choiceButtonTemplate.GetComponentInChildren<TMP_Text>(true) == null)
         {
-            Debug.LogError("DialogueManager needs both TMP texts, a choices container, a choice button template and a Next button.", this);
+            Debug.LogError("Dialogue UI bindings are incomplete. Rebuild the scene via Tools > Build VN Scene.", this);
             enabled = false;
             return;
         }
 
         visuals = GetComponent<VisualManager>();
-        nextButton.gameObject.SetActive(false);
+        SetContinuationVisible(false);
         choiceButtonTemplate.gameObject.SetActive(false);
 
-        if (!LoadDialogue())
+        if (!TryLoadDialogue(out string entryNodeId))
         {
             enabled = false;
             return;
         }
 
-        nextButton.onClick.AddListener(Advance);
-        ShowNode("start");
+        advanceArea.onClick.AddListener(Advance);
+        ShowNode(entryNodeId);
     }
 
-    private bool LoadDialogue()
+    private bool TryLoadDialogue(out string entryNodeId)
     {
+        entryNodeId = null;
         TextAsset json = Resources.Load<TextAsset>(DialoguePath);
         if (json == null)
         {
@@ -99,6 +104,7 @@ public sealed class DialogueManager : MonoBehaviour
             nodes.Add(node.id, node);
         }
 
+        entryNodeId = data.nodes[0].id;
         return true;
     }
 
@@ -110,7 +116,7 @@ public sealed class DialogueManager : MonoBehaviour
             return;
         }
 
-        nextButton.gameObject.SetActive(false);
+        SetContinuationVisible(false);
         foreach (Button button in choiceButtons)
         {
             button.gameObject.SetActive(false);
@@ -135,23 +141,31 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void Update()
     {
-        if (visibleCharacters >= lineLength)
+        if (visibleCharacters < lineLength)
+        {
+            float speed = Mathf.Max(1f, charactersPerSecond);
+            visibleCharacters = Mathf.Min(lineLength, visibleCharacters + Time.unscaledDeltaTime * speed);
+            dialogueText.maxVisibleCharacters = (int)visibleCharacters;
+
+            if (visibleCharacters >= lineLength)
+                ShowActions();
+            return;
+        }
+
+        if (!continueIndicator.isActiveAndEnabled)
             return;
 
-        float speed = Mathf.Max(1f, charactersPerSecond);
-        visibleCharacters = Mathf.Min(lineLength, visibleCharacters + Time.unscaledDeltaTime * speed);
-        dialogueText.maxVisibleCharacters = (int)visibleCharacters;
-
-        if (visibleCharacters >= lineLength)
-            ShowActions();
+        float phase = (Time.unscaledTime - indicatorStartedAt) * (2f * Mathf.PI / IndicatorPeriod);
+        Color color = continueIndicator.color;
+        color.a = (1f + Mathf.Cos(phase)) * 0.5f;
+        continueIndicator.color = color;
     }
 
     private void ShowActions()
     {
         if (currentNode.choices == null || currentNode.choices.Length == 0)
         {
-            nextButton.interactable = HasTarget(currentNode.nextNodeId);
-            nextButton.gameObject.SetActive(true);
+            SetContinuationVisible(HasTarget(currentNode.nextNodeId));
             return;
         }
 
@@ -189,15 +203,26 @@ public sealed class DialogueManager : MonoBehaviour
         return false;
     }
 
+    private void SetContinuationVisible(bool visible)
+    {
+        advanceArea.gameObject.SetActive(visible);
+        continueIndicator.gameObject.SetActive(visible);
+        if (visible)
+        {
+            indicatorStartedAt = Time.unscaledTime;
+            continueIndicator.color = Color.white;
+        }
+    }
+
     private void Advance()
     {
-        if (nextButton.isActiveAndEnabled && nextButton.interactable)
+        if (isActiveAndEnabled && advanceArea.isActiveAndEnabled && advanceArea.interactable)
             ShowNode(currentNode.nextNodeId);
     }
 
     private void OnDestroy()
     {
-        if (nextButton != null)
-            nextButton.onClick.RemoveListener(Advance);
+        if (advanceArea != null)
+            advanceArea.onClick.RemoveListener(Advance);
     }
 }

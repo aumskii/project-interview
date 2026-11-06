@@ -29,6 +29,7 @@ public sealed class VisualManager : MonoBehaviour
         {
             backgroundImage.sprite = sprite;
             backgroundImage.color = sprite != null ? Color.white : fallbackBackground;
+            backgroundImage.enabled = !string.IsNullOrWhiteSpace(resourcePath);
         }
     }
 
