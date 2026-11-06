@@ -183,7 +183,7 @@ public sealed class DialogueManager : MonoBehaviour
     public void RestartFromNode(string nodeId)
     {
         int checkpointIndex = history.FindLastIndex(historyIndex, entry => entry.Node.id == nodeId);
-        if (!TryResolveNode(nodeId, checkpointIndex, null, out DialogueNode node))
+        if (!TryResolveNode(nodeId, checkpointIndex, null, false, out DialogueNode node))
             return;
 
         historyIndex = checkpointIndex;
@@ -196,7 +196,7 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void VisitNode(string nodeId, string choiceFlag, bool addsMistake = false)
     {
-        if (!TryResolveNode(nodeId, historyIndex, choiceFlag, out DialogueNode node))
+        if (!TryResolveNode(nodeId, historyIndex, choiceFlag, addsMistake, out DialogueNode node))
             return;
 
         DiscardForwardHistory();
@@ -214,7 +214,7 @@ public sealed class DialogueManager : MonoBehaviour
         DisplayNode(node, showImmediately: false);
     }
 
-    private bool TryResolveNode(string nodeId, int lastKeptIndex, string choiceFlag, out DialogueNode node)
+    private bool TryResolveNode(string nodeId, int lastKeptIndex, string choiceFlag, bool addsMistake, out DialogueNode node)
     {
         for (int remaining = nodes.Count; remaining > 0; remaining--)
         {
@@ -225,11 +225,28 @@ public sealed class DialogueManager : MonoBehaviour
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(node.requiredFlag) || node.requiredFlag == choiceFlag ||
-                HasFlagAt(node.requiredFlag, lastKeptIndex))
-                return true;
+            if (node.useEduardAtmosphere && !node.isEduardReaction &&
+                node.id != EduardGameOverNodeId && string.IsNullOrWhiteSpace(node.retryNodeId) &&
+                MistakeCountAt(lastKeptIndex) + (addsMistake ? 1 : 0) >= EduardMistakeLimit)
+            {
+                nodeId = EduardGameOverNodeId;
+                continue;
+            }
 
-            nodeId = node.missingFlagNodeId;
+            if (!string.IsNullOrWhiteSpace(node.requiredFlag) && node.requiredFlag != choiceFlag &&
+                !HasFlagAt(node.requiredFlag, lastKeptIndex))
+            {
+                nodeId = node.missingFlagNodeId;
+                continue;
+            }
+
+            if (node.redirectToNextNode)
+            {
+                nodeId = node.nextNodeId;
+                continue;
+            }
+
+            return true;
         }
 
         Debug.LogWarning($"Could not resolve dialogue node '{nodeId}'. Check the flag redirects.", this);
@@ -472,15 +489,13 @@ public sealed class DialogueManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(choice.mismatchNodeId))
         {
             bool addsMistake = currentNode.useEduardAtmosphere && CountsAsMistake(choice);
-            string nextNode = addsMistake && MistakeCountAt(historyIndex) + 1 >= EduardMistakeLimit
-                ? EduardGameOverNodeId
-                : choice.nextNodeId;
-            VisitNode(nextNode, choice.flagToSet, addsMistake);
+            VisitNode(choice.nextNodeId, choice.flagToSet, addsMistake);
             return;
         }
 
-        string target = HasFlagAt(choice.flagToSet, historyIndex) ? choice.nextNodeId : choice.mismatchNodeId;
-        VisitNode(target, null);
+        bool matchesFlag = HasFlagAt(choice.flagToSet, historyIndex);
+        string target = matchesFlag ? choice.nextNodeId : choice.mismatchNodeId;
+        VisitNode(target, null, currentNode.useEduardAtmosphere && !matchesFlag);
     }
 
     private bool CountsAsMistake(Choice choice)

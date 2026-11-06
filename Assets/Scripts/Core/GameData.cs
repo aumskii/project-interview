@@ -15,6 +15,8 @@ public sealed class DialogueNode
     public string retryNodeId;
     public float autoAdvanceDelaySeconds;
     public bool useEduardAtmosphere;
+    public bool isEduardReaction;
+    public bool redirectToNextNode;
 }
 
 [Serializable]

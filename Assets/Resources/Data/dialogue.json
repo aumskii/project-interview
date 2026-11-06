@@ -250,13 +250,31 @@
       "text": "Потолок — это знакомо. У нас, кстати, потолка нет.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
+      "nextNodeId": "rec_why_grow_2",
+      "choices": []
+    },
+    {
+      "id": "rec_why_grow_2",
+      "characterName": "Инга",
+      "text": "В прямом смысле тоже — на верхнем этаже протекает.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
       "nextNodeId": "reception_3",
       "choices": []
     },
     {
       "id": "rec_why_conflict",
       "characterName": "Инга",
-      "text": "С начальниками тут… бывает сложно. Но вы держитесь.",
+      "text": "О, честно. Люблю, когда честно. С начальниками и у нас тут… бывает сложно.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "rec_why_conflict_2",
+      "choices": []
+    },
+    {
+      "id": "rec_why_conflict_2",
+      "characterName": "Инга",
+      "text": "Но вы держитесь.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_3",
@@ -265,7 +283,16 @@
     {
       "id": "rec_why_cut",
       "characterName": "Инга",
-      "text": "Ой, сочувствую. У нас тоже сокращали.",
+      "text": "Ой, сочувствую. У нас тоже сокращали. Двоих.",
+      "background": "bg_reception",
+      "characterSprite": "inga_awkward",
+      "nextNodeId": "rec_why_cut_2",
+      "choices": []
+    },
+    {
+      "id": "rec_why_cut_2",
+      "characterName": "Инга",
+      "text": "Но это было давно.",
       "background": "bg_reception",
       "characterSprite": "inga_awkward",
       "nextNodeId": "reception_3",
@@ -274,7 +301,16 @@
     {
       "id": "rec_why_fired",
       "characterName": "Инга",
-      "text": "Уволили. Прямо так и говорите. Смело. Главное — не врать.",
+      "text": "Уволили. Прямо так и говорите. Смело. Ну, у нас тут тоже… всякое бывает.",
+      "background": "bg_reception",
+      "characterSprite": "inga_surprised",
+      "nextNodeId": "rec_why_fired_2",
+      "choices": []
+    },
+    {
+      "id": "rec_why_fired_2",
+      "characterName": "Инга",
+      "text": "Главное — не врать.",
       "background": "bg_reception",
       "characterSprite": "inga_surprised",
       "nextNodeId": "reception_3",
@@ -313,7 +349,16 @@
     {
       "id": "rec_five_boss",
       "characterName": "Инга",
-      "text": "О, амбициозно. У нас как раз отдела нет.",
+      "text": "О, амбициозно. Только тут, чтобы дорасти до руководителя, нужно сначала выжить на собеседовании у нашего директора.",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "rec_five_boss_2",
+      "choices": []
+    },
+    {
+      "id": "rec_five_boss_2",
+      "characterName": "Инга",
+      "text": "А он, скажем так… своеобразный.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_4",
@@ -322,7 +367,16 @@
     {
       "id": "rec_five_people",
       "characterName": "Инга",
-      "text": "С людьми — это вы по адресу. Бумажек у нас тоже хватает.",
+      "text": "Ой, с людьми — это вы по адресу. Бумажек у нас тоже хватает,",
+      "background": "bg_reception",
+      "characterSprite": "inga_base",
+      "nextNodeId": "rec_five_people_2",
+      "choices": []
+    },
+    {
+      "id": "rec_five_people_2",
+      "characterName": "Инга",
+      "text": "но люди… люди интереснее.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_4",
@@ -340,7 +394,16 @@
     {
       "id": "rec_five_guess",
       "characterName": "Инга",
-      "text": "Разумно. У нас тут планы любят ломаться.",
+      "text": "Разумно. У нас тут тоже…",
+      "background": "bg_reception",
+      "characterSprite": "inga_awkward",
+      "nextNodeId": "rec_five_guess_2",
+      "choices": []
+    },
+    {
+      "id": "rec_five_guess_2",
+      "characterName": "Инга",
+      "text": "планы любят ломаться.",
       "background": "bg_reception",
       "characterSprite": "inga_awkward",
       "nextNodeId": "reception_4",
@@ -397,7 +460,16 @@
     {
       "id": "rec_stress_pillow",
       "characterName": "Инга",
-      "text": "Ха, стены тут тонкие, кричать лучше не надо.",
+      "text": "Ха, если вас возьмут, лучше не кричите в офисе.",
+      "background": "bg_reception",
+      "characterSprite": "inga_laugh",
+      "nextNodeId": "rec_stress_pillow_2",
+      "choices": []
+    },
+    {
+      "id": "rec_stress_pillow_2",
+      "characterName": "Инга",
+      "text": "Тут стены тонкие, и начальство не любит лишний шум.",
       "background": "bg_reception",
       "characterSprite": "inga_laugh",
       "nextNodeId": "reception_5",
@@ -463,8 +535,19 @@
       "text": "Впереди турникет. У турникета стоит охранник. Не двигается. Смотрит в планшет.",
       "background": "bg_corridor_turnstile",
       "characterSprite": "",
-      "nextNodeId": "tolik_meet_1",
+      "nextNodeId": "corridor_stress_thought",
       "choices": []
+    },
+    {
+      "id": "corridor_stress_thought",
+      "characterName": "",
+      "text": "Что-то я всё же волнуюсь… Сказал Инге, что стрессоустойчивый, а у самого руки трясутся. Надеюсь, тут не проверяют.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "",
+      "nextNodeId": "tolik_meet_1",
+      "choices": [],
+      "requiredFlag": "said_stressproof",
+      "missingFlagNodeId": "tolik_meet_1"
     },
     {
       "id": "tolik_meet_1",
@@ -486,10 +569,20 @@
         },
         {
           "choiceText": "А какая разница?",
-          "nextNodeId": "tolik_game_over",
+          "nextNodeId": "tolik_hamim",
           "flagToSet": ""
         }
       ]
+    },
+    {
+      "id": "tolik_hamim",
+      "characterName": "Толик",
+      "text": "Хамим значит...",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "tolik_game_over",
+      "choices": [],
+      "autoAdvanceDelaySeconds": 2.5
     },
     {
       "id": "tolik_meet_ok",
@@ -716,7 +809,7 @@
       "characterName": "Толик",
       "text": "Кабинет 13. Третий этаж, направо, до конца.",
       "background": "bg_corridor_turnstile",
-      "characterSprite": "tolik_base",
+      "characterSprite": "tolik_looking",
       "nextNodeId": "",
       "choices": [
         {
@@ -741,7 +834,7 @@
       "characterName": "Толик",
       "text": "Кабинет 13. Третий этаж, направо, до конца.",
       "background": "bg_corridor_turnstile",
-      "characterSprite": "tolik_base",
+      "characterSprite": "tolik_looking",
       "nextNodeId": "",
       "choices": [
         {
@@ -766,8 +859,8 @@
       "characterName": "Толик",
       "text": "Не за что. Удачи. Она тут нужна.",
       "background": "bg_corridor_turnstile",
-      "characterSprite": "tolik_base",
-      "nextNodeId": "elevator_transition",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "after_tolik_thought",
       "choices": []
     },
     {
@@ -775,8 +868,8 @@
       "characterName": "Толик",
       "text": "Увидите. Или не увидите. Как получится.",
       "background": "bg_corridor_turnstile",
-      "characterSprite": "tolik_base",
-      "nextNodeId": "elevator_transition",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "after_tolik_thought",
       "choices": []
     },
     {
@@ -784,7 +877,16 @@
       "characterName": "Толик",
       "text": "Тогда обратно через меня. И без ножей.",
       "background": "bg_corridor_turnstile",
-      "characterSprite": "tolik_base",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "after_tolik_thought",
+      "choices": []
+    },
+    {
+      "id": "after_tolik_thought",
+      "characterName": "",
+      "text": "Фух… кажется, тут справился. Охранник пропустил. Можно идти дальше.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "",
       "nextNodeId": "elevator_transition",
       "choices": []
     },
@@ -844,17 +946,17 @@
       "choices": [
         {
           "choiceText": "Нормально. Охранник пропустил.",
-          "nextNodeId": "eduard_2",
+          "nextNodeId": "ed1_A",
           "flagToSet": ""
         },
         {
           "choiceText": "Долго искал кабинет. Тут запутано.",
-          "nextNodeId": "eduard_2",
+          "nextNodeId": "ed1_B",
           "flagToSet": ""
         },
         {
           "choiceText": "А вы не знаете? Вам же сказали.",
-          "nextNodeId": "eduard_2",
+          "nextNodeId": "ed1_C",
           "flagToSet": "",
           "addsMistake": true
         }
@@ -862,67 +964,243 @@
       "useEduardAtmosphere": true
     },
     {
+      "id": "ed1_A",
+      "characterName": "Эдуард",
+      "text": "Пропустил, значит. Хорошо.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed1_A_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed1_A_2",
+      "characterName": "Эдуард",
+      "text": "Толик просто так не пропускает. Ладно. Мне тут написали, что вы ушли с прошлой работы...",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed1_B",
+      "characterName": "Эдуард",
+      "text": "Запутано. Именно так. Я специально выбрал кабинет в самой дальней части этажа.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed1_B_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed1_B_2",
+      "characterName": "Эдуард",
+      "text": "Люблю, когда люди внимательны. Итак, мне тут написали, что вы ушли с прошлой работы...",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed1_C",
+      "characterName": "Эдуард",
+      "text": "Сказали. Но я хочу услышать от вас.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed1_C_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed1_C_2",
+      "characterName": "Эдуард",
+      "text": "Запомните это. Итак, почему ушли с прошлой работы?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
       "id": "eduard_2",
       "characterName": "Эдуард",
-      "text": "Мне тут написали… что вы ушли с прошлой работы. Или вас ушли. Я не разобрал почерк. Так что случилось?",
+      "text": "Так что случилось? Только честно.",
       "background": "bg_eduard_office_neutral",
       "characterSprite": "eduard_neutral",
       "nextNodeId": "",
       "choices": [
         {
           "choiceText": "Хотел расти",
-          "nextNodeId": "eduard_3",
-          "flagToSet": "",
-          "mistakeUnlessFlag": "said_grow"
+          "nextNodeId": "ed2_GROW",
+          "flagToSet": "said_grow",
+          "mismatchNodeId": "ed2_BAD"
         },
         {
           "choiceText": "Конфликт",
-          "nextNodeId": "eduard_3",
-          "flagToSet": "",
-          "mistakeUnlessFlag": "said_conflict"
+          "nextNodeId": "ed2_CONFLICT",
+          "flagToSet": "said_conflict",
+          "mismatchNodeId": "ed2_BAD"
         },
         {
           "choiceText": "Сократили",
-          "nextNodeId": "eduard_3",
-          "flagToSet": "",
-          "mistakeUnlessFlag": "said_cut"
+          "nextNodeId": "ed2_CUT",
+          "flagToSet": "said_cut",
+          "mismatchNodeId": "ed2_BAD"
         },
         {
           "choiceText": "Меня уволили",
-          "nextNodeId": "eduard_3",
-          "flagToSet": "",
-          "mistakeUnlessFlag": "said_fired"
+          "nextNodeId": "ed2_FIRED",
+          "flagToSet": "said_fired",
+          "mismatchNodeId": "ed2_BAD"
         }
       ],
       "useEduardAtmosphere": true
     },
     {
+      "id": "ed2_GROW",
+      "characterName": "Эдуард",
+      "text": "Расти. Похвально.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed2_GROW_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_GROW_2",
+      "characterName": "Эдуард",
+      "text": "Но обычно так говорят, когда не хотят называть причину. Ладно. Если бы вы были предметом в этом офисе, каким?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_3",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_CONFLICT",
+      "characterName": "Эдуард",
+      "text": "Конфликт. С начальством, значит.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed2_CONFLICT_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_CONFLICT_2",
+      "characterName": "Эдуард",
+      "text": "Смело. Или глупо. Надеюсь, мы с вами поладим. Если бы вы были предметом в этом офисе, каким?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_3",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_CUT",
+      "characterName": "Эдуард",
+      "text": "Сократили. Классика.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed2_CUT_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_CUT_2",
+      "characterName": "Эдуард",
+      "text": "Люди уходят, компания остается. Ладно, верю. Если бы вы были предметом в этом офисе, каким?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_3",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_FIRED",
+      "characterName": "Эдуард",
+      "text": "Уволили. Прямо так и говорите.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed2_FIRED_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_FIRED_2",
+      "characterName": "Эдуард",
+      "text": "Хорошо. Честность — редкая штука. Если бы вы были предметом в этом офисе, каким?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_3",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_BAD",
+      "characterName": "Эдуард",
+      "text": "А на входе вы сказали иначе.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed2_BAD_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed2_BAD_2",
+      "characterName": "Эдуард",
+      "text": "Интересно. Ладно, посмотрим, что вы скажете дальше. Если бы вы были предметом в этом офисе, каким?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_3",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
       "id": "eduard_3",
       "characterName": "Эдуард",
-      "text": "Если бы вы были предметом в этом офисе, каким? Не думайте долго.",
+      "text": "Не думайте долго. Первое, что в голову.",
       "background": "bg_eduard_office_neutral",
       "characterSprite": "eduard_neutral",
       "nextNodeId": "",
       "choices": [
         {
           "choiceText": "Стул. На мне все сидят.",
-          "nextNodeId": "eduard_4",
+          "nextNodeId": "ed3_STOOL",
           "flagToSet": "",
           "addsMistake": true
         },
         {
           "choiceText": "Кулер. Все ко мне подходят, когда им нужно.",
-          "nextNodeId": "eduard_4",
+          "nextNodeId": "ed3_COOLER",
           "flagToSet": ""
         },
         {
           "choiceText": "Плафон. Светит, но все жалуются, что ярко.",
-          "nextNodeId": "eduard_4",
+          "nextNodeId": "ed3_LAMP",
           "flagToSet": ""
         },
         {
           "choiceText": "Дверь. Чтобы все выходили.",
-          "nextNodeId": "eduard_4",
+          "nextNodeId": "ed3_DOOR",
           "flagToSet": "",
           "addsMistake": true
         }
@@ -930,16 +1208,104 @@
       "useEduardAtmosphere": true
     },
     {
+      "id": "ed3_STOOL",
+      "characterName": "Эдуард",
+      "text": "Стул. Значит, вас используют.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed3_STOOL_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed3_STOOL_2",
+      "characterName": "Эдуард",
+      "text": "И вы не против. Интересно. Вы когда-нибудь врали на собеседовании?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_4",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed3_COOLER",
+      "characterName": "Эдуард",
+      "text": "Кулер. Полезный.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed3_COOLER_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed3_COOLER_2",
+      "characterName": "Эдуард",
+      "text": "Но никто не замечает, пока не сломается. Хорошо. Вы когда-нибудь врали на собеседовании?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_4",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed3_LAMP",
+      "characterName": "Эдуард",
+      "text": "Плафон. Светит, но все жалуются, что ярко.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed3_LAMP_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed3_LAMP_2",
+      "characterName": "Эдуард",
+      "text": "Хорошо. Мне нравится. Вы когда-нибудь врали на собеседовании?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_4",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed3_DOOR",
+      "characterName": "Эдуард",
+      "text": "Дверь. Интересно.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed3_DOOR_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed3_DOOR_2",
+      "characterName": "Эдуард",
+      "text": "А я думал, вы скажете что-то… живое. Ладно. Вы когда-нибудь врали на собеседовании?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_4",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
       "id": "eduard_4",
       "characterName": "Эдуард",
-      "text": "Вы когда-нибудь врали на собеседовании?",
+      "text": "Смотрит прямо. Жду ответа.",
       "background": "bg_eduard_office_neutral",
       "characterSprite": "eduard_neutral",
       "nextNodeId": "",
       "choices": [
         {
           "choiceText": "Нет.",
-          "nextNodeId": "eduard_5",
+          "nextNodeId": "ed4_NO",
           "flagToSet": "",
           "mistakeIfAnyFlags": [
             "said_grow",
@@ -949,81 +1315,257 @@
         },
         {
           "choiceText": "Все врут. Но я стараюсь не врать.",
-          "nextNodeId": "eduard_5",
+          "nextNodeId": "ed4_ALL",
           "flagToSet": ""
         },
         {
           "choiceText": "А вы?",
-          "nextNodeId": "eduard_5",
+          "nextNodeId": "ed4_YOU",
           "flagToSet": ""
         },
         {
           "choiceText": "Смотря что считать враньём.",
-          "nextNodeId": "eduard_5",
+          "nextNodeId": "ed4_PHIL",
           "flagToSet": ""
         }
       ],
       "useEduardAtmosphere": true
     },
     {
+      "id": "ed4_NO",
+      "characterName": "Эдуард",
+      "text": "А мне сказали иначе.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed4_NO_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed4_NO_2",
+      "characterName": "Эдуард",
+      "text": "Или я путаю? Ладно. А если я скажу, что вы нам не подходите? Что вы сделаете?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_5",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed4_ALL",
+      "characterName": "Эдуард",
+      "text": "Все врут. Хорошо.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed4_ALL_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed4_ALL_2",
+      "characterName": "Эдуард",
+      "text": "Честно. Идем дальше. А если я скажу, что вы нам не подходите? Что вы сделаете?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_5",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed4_YOU",
+      "characterName": "Эдуард",
+      "text": "Я не собеседуюсь.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed4_YOU_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed4_YOU_2",
+      "characterName": "Эдуард",
+      "text": "Я спрашиваю. Запомните это. А если я скажу, что вы нам не подходите? Что вы сделаете?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_5",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed4_PHIL",
+      "characterName": "Эдуард",
+      "text": "Философ.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed4_PHIL_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed4_PHIL_2",
+      "characterName": "Эдуард",
+      "text": "Ладно. Запомнил. А если я скажу, что вы нам не подходите? Что вы сделаете?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_5",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
       "id": "eduard_5",
       "characterName": "Эдуард",
-      "text": "А если я скажу, что вы нам не подходите? Прямо сейчас. Что вы сделаете?",
+      "text": "Прямо сейчас. Что вы сделаете?",
       "background": "bg_eduard_office_neutral",
       "characterSprite": "eduard_neutral",
       "nextNodeId": "",
       "choices": [
         {
           "choiceText": "Спрошу почему. Может, смогу исправить.",
-          "nextNodeId": "eduard_6",
+          "nextNodeId": "ed5_FIX",
           "flagToSet": ""
         },
         {
           "choiceText": "Уйду. Не буду навязываться.",
-          "nextNodeId": "eduard_6",
+          "nextNodeId": "ed5_LEAVE",
           "flagToSet": ""
         },
         {
           "choiceText": "А вы уже решили?",
-          "nextNodeId": "eduard_6",
+          "nextNodeId": "ed5_DECIDE",
           "flagToSet": "",
           "addsMistake": true
         },
         {
           "choiceText": "Спрошу, почему вы так думаете.",
-          "nextNodeId": "eduard_6",
+          "nextNodeId": "ed5_WHY",
           "flagToSet": ""
         }
       ],
       "useEduardAtmosphere": true
     },
     {
+      "id": "ed5_FIX",
+      "characterName": "Эдуард",
+      "text": "Исправить. Хорошо.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed5_FIX_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed5_FIX_2",
+      "characterName": "Эдуард",
+      "text": "Но не всё исправляется. Ладно. Есть вопросы ко мне?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_6",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed5_LEAVE",
+      "characterName": "Эдуард",
+      "text": "Уйдёте. Ладно.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed5_LEAVE_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed5_LEAVE_2",
+      "characterName": "Эдуард",
+      "text": "Это тоже ответ. Хорошо. Есть вопросы ко мне?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_6",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed5_DECIDE",
+      "characterName": "Эдуард",
+      "text": "Я решаю. Не вы.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed5_DECIDE_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed5_DECIDE_2",
+      "characterName": "Эдуард",
+      "text": "Запомните это. Идем дальше. Есть вопросы ко мне?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_6",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed5_WHY",
+      "characterName": "Эдуард",
+      "text": "Спросите. Хорошо.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed5_WHY_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed5_WHY_2",
+      "characterName": "Эдуард",
+      "text": "Мне нравится, когда спрашивают. Есть вопросы ко мне?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "eduard_6",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
       "id": "eduard_6",
       "characterName": "Эдуард",
-      "text": "Ну что. Есть вопросы ко мне?",
+      "text": "Готов ответить на любые.",
       "background": "bg_eduard_office_neutral",
       "characterSprite": "eduard_neutral",
       "nextNodeId": "",
       "choices": [
         {
           "choiceText": "Да. Что самое сложное в этой работе?",
-          "nextNodeId": "eduard_good_end",
+          "nextNodeId": "ed6_HARD",
           "flagToSet": ""
         },
         {
           "choiceText": "Нет. Всё понятно.",
-          "nextNodeId": "eduard_good_end",
+          "nextNodeId": "ed6_OK",
           "flagToSet": ""
         },
         {
           "choiceText": "Да. Почему у вас так… странно?",
-          "nextNodeId": "eduard_good_end",
+          "nextNodeId": "ed6_WEIRD",
           "flagToSet": "",
           "addsMistake": true
         },
         {
           "choiceText": "А вы бы взяли себя на эту работу?",
-          "nextNodeId": "eduard_good_end",
+          "nextNodeId": "ed6_SELF",
           "flagToSet": "",
           "addsMistake": true
         }
@@ -1031,24 +1573,125 @@
       "useEduardAtmosphere": true
     },
     {
-      "id": "eduard_good_end",
+      "id": "ed6_HARD",
       "characterName": "Эдуард",
-      "text": "Что ж. Хорошо. Я подумаю. Вы свободны.",
+      "text": "Люди. Люди — самое сложное.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed6_HARD_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed6_HARD_2",
+      "characterName": "Эдуард",
+      "text": "Но вы справитесь. Может быть. Что ж. Я подумаю. Вы свободны.",
       "background": "bg_eduard_office_neutral",
       "characterSprite": "eduard_neutral",
       "nextNodeId": "finale_1",
       "choices": [],
-      "useEduardAtmosphere": true
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed6_OK",
+      "characterName": "Эдуард",
+      "text": "Всё понятно. Хорошо.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed6_OK_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed6_OK_2",
+      "characterName": "Эдуард",
+      "text": "Мне нравится, когда всё понятно. Иногда. Я подумаю. Вы свободны.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "finale_1",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed6_WEIRD",
+      "characterName": "Эдуард",
+      "text": "Странно?",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed6_WEIRD_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed6_WEIRD_2",
+      "characterName": "Эдуард",
+      "text": "Это вы ещё не видели странного. Я подумаю. Вы свободны.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "finale_1",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed6_SELF",
+      "characterName": "Эдуард",
+      "text": "Себя? Я бы себя не взял.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "ed6_SELF_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "ed6_SELF_2",
+      "characterName": "Эдуард",
+      "text": "Но я здесь. Я подумаю. Вы свободны.",
+      "background": "bg_eduard_office_neutral",
+      "characterSprite": "eduard_neutral",
+      "nextNodeId": "finale_1",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
     },
     {
       "id": "eduard_game_over",
+      "characterName": "Эдуард",
+      "text": "",
+      "background": "bg_eduard_office_demon",
+      "characterSprite": "eduard_demon",
+      "nextNodeId": "eduard_final_1",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "redirectToNextNode": true
+    },
+    {
+      "id": "eduard_final_1",
+      "characterName": "Эдуард",
+      "text": "Хотя… это уже не имеет значения.",
+      "background": "bg_eduard_office_demon",
+      "characterSprite": "eduard_demon",
+      "nextNodeId": "eduard_final_2",
+      "choices": [],
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
+    },
+    {
+      "id": "eduard_final_2",
       "characterName": "Эдуард",
       "text": "Знаете, Слава. Я думаю, мы вам перезвоним.",
       "background": "bg_eduard_office_demon",
       "characterSprite": "eduard_demon",
       "nextNodeId": "eduard_game_over_screen",
       "choices": [],
-      "useEduardAtmosphere": true
+      "useEduardAtmosphere": true,
+      "isEduardReaction": true
     },
     {
       "id": "eduard_game_over_screen",
