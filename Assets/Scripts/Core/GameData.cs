@@ -13,6 +13,8 @@ public sealed class DialogueNode
     public string requiredFlag;
     public string missingFlagNodeId;
     public string retryNodeId;
+    public float autoAdvanceDelaySeconds;
+    public bool useEduardAtmosphere;
 }
 
 [Serializable]
@@ -22,6 +24,9 @@ public sealed class Choice
     public string nextNodeId;
     public string flagToSet;
     public string mismatchNodeId;
+    public bool addsMistake;
+    public string mistakeUnlessFlag;
+    public string[] mistakeIfAnyFlags;
 }
 
 [Serializable]

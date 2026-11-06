@@ -142,6 +142,8 @@ public static class SceneBuilder
         manager.Configure(panel.gameObject, speaker, dialogue, choices, choiceTemplate,
             advanceArea, continueIndicator, back, forward);
         manager.ConfigureGameOver(gameOverPanel.gameObject, baton, blackoutFade, titleFade, retry, retryFade, cameraShake);
+        manager.ConfigureMusic(CreateMusicSource(systems.transform, "MusicNeutral"),
+            CreateMusicSource(systems.transform, "MusicTense"), CreateMusicSource(systems.transform, "MusicHorror"));
 
         if (!EditorSceneManager.SaveScene(scene, ScenePath))
         {
@@ -217,6 +219,15 @@ public static class SceneBuilder
         {
             UnityEngine.Object.DestroyImmediate(texture);
         }
+    }
+
+    private static AudioSource CreateMusicSource(Transform parent, string name)
+    {
+        var source = new GameObject(name, typeof(AudioSource)).GetComponent<AudioSource>();
+        source.transform.SetParent(parent, false);
+        source.playOnAwake = false;
+        source.loop = true;
+        return source;
     }
 
     private static CameraShake CreateCamera()

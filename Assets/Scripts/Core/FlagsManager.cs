@@ -9,8 +9,15 @@ public sealed class FlagsManager
     private readonly HashSet<string> flags = new HashSet<string>(StringComparer.Ordinal);
     private readonly Dictionary<string, int> choiceFlagCounts =
         new Dictionary<string, int>(StringComparer.Ordinal);
+    private int mistakeCount;
+
+    public int MistakeCount => mistakeCount;
 
     private FlagsManager() { }
+
+    public void AddMistake() => mistakeCount++;
+
+    internal void RemoveMistake() => mistakeCount = Math.Max(0, mistakeCount - 1);
 
     public void SetFlag(string flag)
     {
@@ -38,12 +45,17 @@ public sealed class FlagsManager
             choiceFlagCounts[flag] = count - 1;
     }
 
-    public bool HasFlag(string flag) => flag != null && (flags.Contains(flag) || choiceFlagCounts.ContainsKey(flag));
+    public bool HasFlag(string flag) => HasFlagAfterRemovingChoices(flag, 0);
+
+    internal bool HasFlagAfterRemovingChoices(string flag, int removedChoices) =>
+        flag != null && (flags.Contains(flag) ||
+            (choiceFlagCounts.TryGetValue(flag, out int count) && count > removedChoices));
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForPlaySession()
     {
         Instance.flags.Clear();
         Instance.choiceFlagCounts.Clear();
+        Instance.mistakeCount = 0;
     }
 }

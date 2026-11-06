@@ -11,11 +11,25 @@ public sealed class DialogueManager : MonoBehaviour
 {
     public const string DialoguePath = "Data/dialogue";
     private const float IndicatorPeriod = 1.2f;
-    private const float BatonTravelSeconds = 0.1f;
-    private const float ImpactBlackoutSeconds = 0.15f;
-    private const float GameOverTitleFadeSeconds = 1f;
-    private const float GameOverRetryDelaySeconds = 2f;
-    private const float GameOverRetryFadeSeconds = 0.35f;
+    private const float BatonTravelSeconds = 0.7f;
+    private const float ImpactShakeSeconds = 0.5f;
+    private const float PostImpactPauseSeconds = 1f;
+    private const float BlackScreenPauseSeconds = 1f;
+    private const float GameOverTitleFadeSeconds = 3f;
+    private const float GameOverRetryDelaySeconds = 3f;
+    private const float GameOverRetryFadeSeconds = 1.5f;
+    private const int EduardMistakeLimit = 3;
+    private const string EduardGameOverNodeId = "eduard_game_over";
+
+    private static readonly string[] EduardBackgrounds =
+    {
+        "bg_eduard_office_neutral", "bg_eduard_office_interested",
+        "bg_eduard_office_angry", "bg_eduard_office_demon",
+    };
+    private static readonly string[] EduardPortraits =
+    {
+        "eduard_neutral", "eduard_smiling", "eduard_angry", "eduard_demon",
+    };
 
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TMP_Text speakerText;
@@ -33,21 +47,26 @@ public sealed class DialogueManager : MonoBehaviour
     [SerializeField] private Button retryButton;
     [SerializeField] private CanvasGroup retryFade;
     [SerializeField] private CameraShake cameraShake;
+    [SerializeField] private AudioSource musicNeutral;
+    [SerializeField] private AudioSource musicTense;
+    [SerializeField] private AudioSource musicHorror;
     [SerializeField, Min(1f)] private float charactersPerSecond = 52f;
 
     private readonly Dictionary<string, DialogueNode> nodes =
         new Dictionary<string, DialogueNode>(StringComparer.Ordinal);
     private readonly List<Button> choiceButtons = new List<Button>();
-    private readonly List<(DialogueNode Node, string ChoiceFlag)> history =
-        new List<(DialogueNode Node, string ChoiceFlag)>();
+    private readonly List<(DialogueNode Node, string ChoiceFlag, bool AddsMistake)> history =
+        new List<(DialogueNode Node, string ChoiceFlag, bool AddsMistake)>();
 
     private VisualManager visuals;
+    private AudioSource currentMusic;
     private Coroutine gameOverSequence;
     private DialogueNode currentNode;
     private int historyIndex = -1;
     private int lineLength;
     private float visibleCharacters;
     private float indicatorStartedAt;
+    private float? autoAdvanceAt;
 
     private bool CanGoForward => historyIndex < history.Count - 1;
     private bool IsRetryNode => !string.IsNullOrWhiteSpace(currentNode?.retryNodeId);
@@ -76,6 +95,13 @@ public sealed class DialogueManager : MonoBehaviour
         retryButton = retry;
         retryFade = retryGroup;
         cameraShake = shake;
+    }
+
+    public void ConfigureMusic(AudioSource neutral, AudioSource tense, AudioSource horror)
+    {
+        musicNeutral = neutral;
+        musicTense = tense;
+        musicHorror = horror;
     }
 
     private void Start()
@@ -165,22 +191,25 @@ public sealed class DialogueManager : MonoBehaviour
         if (checkpointIndex >= 0 && history[checkpointIndex].Node == node)
             DisplayNode(node, showImmediately: false);
         else
-            EnterNode(node, null);
+            EnterNode(node, null, false);
     }
 
-    private void VisitNode(string nodeId, string choiceFlag)
+    private void VisitNode(string nodeId, string choiceFlag, bool addsMistake = false)
     {
         if (!TryResolveNode(nodeId, historyIndex, choiceFlag, out DialogueNode node))
             return;
 
         DiscardForwardHistory();
-        EnterNode(node, choiceFlag);
+        EnterNode(node, choiceFlag, addsMistake);
     }
 
-    private void EnterNode(DialogueNode node, string choiceFlag)
+    private void EnterNode(DialogueNode node, string choiceFlag, bool addsMistake)
     {
         FlagsManager.Instance.AddChoiceFlag(choiceFlag);
-        history.Add((node, choiceFlag));
+        if (addsMistake)
+            FlagsManager.Instance.AddMistake();
+
+        history.Add((node, choiceFlag, addsMistake));
         historyIndex = history.Count - 1;
         DisplayNode(node, showImmediately: false);
     }
@@ -227,13 +256,30 @@ public sealed class DialogueManager : MonoBehaviour
 
         int firstDiscarded = historyIndex + 1;
         for (int i = firstDiscarded; i < history.Count; i++)
+        {
             FlagsManager.Instance.RemoveChoiceFlag(history[i].ChoiceFlag);
+            if (history[i].AddsMistake)
+                FlagsManager.Instance.RemoveMistake();
+        }
 
         history.RemoveRange(firstDiscarded, history.Count - firstDiscarded);
     }
 
+    private int MistakeCountAt(int lastKeptIndex)
+    {
+        int count = FlagsManager.Instance.MistakeCount;
+        for (int i = lastKeptIndex + 1; i < history.Count; i++)
+        {
+            if (history[i].AddsMistake)
+                count--;
+        }
+
+        return count;
+    }
+
     private void DisplayNode(DialogueNode node, bool showImmediately)
     {
+        autoAdvanceAt = null;
         if (IsRetryNode)
             ResetGameOverPresentation();
 
@@ -246,7 +292,11 @@ public sealed class DialogueManager : MonoBehaviour
         choiceButtons.Clear();
 
         currentNode = node;
-        visuals.SetBackground(node.background);
+        int officeMood = node.useEduardAtmosphere
+            ? Mathf.Clamp(MistakeCountAt(historyIndex), 0, EduardMistakeLimit)
+            : 0;
+        visuals.SetBackground(node.useEduardAtmosphere ? EduardBackgrounds[officeMood] : node.background);
+        UpdateMusic(node.useEduardAtmosphere, officeMood);
         if (IsRetryNode)
         {
             visuals.SetCharacterSprite(null);
@@ -260,7 +310,7 @@ public sealed class DialogueManager : MonoBehaviour
         }
 
         dialoguePanel.SetActive(true);
-        visuals.SetCharacterSprite(node.characterSprite);
+        visuals.SetCharacterSprite(node.useEduardAtmosphere ? EduardPortraits[officeMood] : node.characterSprite);
         speakerText.text = node.characterName ?? string.Empty;
 
         dialogueText.text = node.text ?? string.Empty;
@@ -280,46 +330,50 @@ public sealed class DialogueManager : MonoBehaviour
     private IEnumerator PlayGameOverSequence()
     {
         dialoguePanel.SetActive(false);
-        batonImage.sprite = VisualManager.LoadCharacterSprite(currentNode.characterSprite);
-        if (batonImage.sprite != null)
+        if (!currentNode.useEduardAtmosphere)
         {
-            RectTransform batonRect = batonImage.rectTransform;
-            var leftCenter = new Vector2(0f, 0.5f);
-            batonRect.anchorMin = batonRect.anchorMax = batonRect.pivot = leftCenter;
-            batonRect.sizeDelta = new Vector2(2000f, 2000f);
-            batonRect.anchoredPosition = new Vector2(-1500f, 0f);
-            batonImage.color = new Color(1f, 1f, 1f, 0f);
-            batonImage.gameObject.SetActive(true);
-
-            float swingStartedAt = Time.unscaledTime;
-            for (float progress = 0f; progress < 1f; progress = (Time.unscaledTime - swingStartedAt) / BatonTravelSeconds)
+            batonImage.sprite = VisualManager.LoadCharacterSprite(currentNode.characterSprite);
+            if (batonImage.sprite != null)
             {
-                batonRect.anchoredPosition = new Vector2(Mathf.SmoothStep(-1500f, 0f, progress), 0f);
-                batonImage.color = new Color(1f, 1f, 1f, Mathf.Clamp01(progress * 6f));
-                yield return null;
+                RectTransform batonRect = batonImage.rectTransform;
+                var leftCenter = new Vector2(0f, 0.5f);
+                batonRect.anchorMin = batonRect.anchorMax = batonRect.pivot = leftCenter;
+                batonRect.sizeDelta = new Vector2(2000f, 2000f);
+                batonRect.anchoredPosition = new Vector2(-1500f, 0f);
+                batonImage.color = new Color(1f, 1f, 1f, 0f);
+                batonImage.gameObject.SetActive(true);
+
+                float swingStartedAt = Time.unscaledTime;
+                for (float progress = 0f; progress < 1f; progress = (Time.unscaledTime - swingStartedAt) / BatonTravelSeconds)
+                {
+                    batonRect.anchoredPosition = new Vector2(Mathf.SmoothStep(-1500f, 0f, progress), 0f);
+                    batonImage.color = new Color(1f, 1f, 1f, Mathf.Clamp01(progress * 6f));
+                    yield return null;
+                }
+
+                batonRect.anchoredPosition = Vector2.zero;
             }
 
-            batonRect.anchoredPosition = Vector2.zero;
+            cameraShake.Shake(ImpactShakeSeconds, 0.30f);
+            batonImage.gameObject.SetActive(false);
+            yield return new WaitForSecondsRealtime(PostImpactPauseSeconds);
         }
 
-        cameraShake.Shake(ImpactBlackoutSeconds, 0.30f);
-        batonImage.gameObject.SetActive(false);
-        blackoutFade.alpha = 0f;
+        blackoutFade.alpha = 1f;
         gameOverTitleFade.alpha = 0f;
         retryFade.alpha = 0f;
         retryFade.blocksRaycasts = false;
         retryButton.interactable = false;
         gameOverPanel.SetActive(true);
+        yield return new WaitForSecondsRealtime(BlackScreenPauseSeconds);
 
-        float impactTime = Time.unscaledTime;
-        for (float elapsed = 0f; elapsed < GameOverTitleFadeSeconds; elapsed = Time.unscaledTime - impactTime)
+        float titleStartedAt = Time.unscaledTime;
+        for (float elapsed = 0f; elapsed < GameOverTitleFadeSeconds; elapsed = Time.unscaledTime - titleStartedAt)
         {
-            blackoutFade.alpha = Mathf.Clamp01(elapsed / ImpactBlackoutSeconds);
             gameOverTitleFade.alpha = elapsed / GameOverTitleFadeSeconds;
             yield return null;
         }
 
-        blackoutFade.alpha = 1f;
         gameOverTitleFade.alpha = 1f;
         yield return new WaitForSecondsRealtime(GameOverRetryDelaySeconds);
 
@@ -365,6 +419,13 @@ public sealed class DialogueManager : MonoBehaviour
             return;
         }
 
+        if (autoAdvanceAt.HasValue && Time.unscaledTime >= autoAdvanceAt.Value)
+        {
+            autoAdvanceAt = null;
+            AdvanceToNextNode();
+            return;
+        }
+
         if (!continueIndicator.isActiveAndEnabled)
             return;
 
@@ -378,7 +439,14 @@ public sealed class DialogueManager : MonoBehaviour
     {
         if (currentNode.choices == null || currentNode.choices.Length == 0)
         {
-            SetContinuationVisible(CanGoForward || HasTarget(currentNode.nextNodeId));
+            bool hasNext = CanGoForward || HasTarget(currentNode.nextNodeId);
+            if (hasNext && currentNode.autoAdvanceDelaySeconds > 0f)
+            {
+                autoAdvanceAt = Time.unscaledTime + currentNode.autoAdvanceDelaySeconds;
+                return;
+            }
+
+            SetContinuationVisible(hasNext);
             return;
         }
 
@@ -403,12 +471,55 @@ public sealed class DialogueManager : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(choice.mismatchNodeId))
         {
-            VisitNode(choice.nextNodeId, choice.flagToSet);
+            bool addsMistake = currentNode.useEduardAtmosphere && CountsAsMistake(choice);
+            string nextNode = addsMistake && MistakeCountAt(historyIndex) + 1 >= EduardMistakeLimit
+                ? EduardGameOverNodeId
+                : choice.nextNodeId;
+            VisitNode(nextNode, choice.flagToSet, addsMistake);
             return;
         }
 
         string target = HasFlagAt(choice.flagToSet, historyIndex) ? choice.nextNodeId : choice.mismatchNodeId;
         VisitNode(target, null);
+    }
+
+    private bool CountsAsMistake(Choice choice)
+    {
+        if (choice.addsMistake || (!string.IsNullOrWhiteSpace(choice.mistakeUnlessFlag) &&
+            !HasFlagAt(choice.mistakeUnlessFlag, historyIndex)))
+            return true;
+
+        foreach (string flag in choice.mistakeIfAnyFlags ?? Array.Empty<string>())
+        {
+            if (HasFlagAt(flag, historyIndex))
+                return true;
+        }
+
+        return false;
+    }
+
+    private void UpdateMusic(bool inOffice, int officeMood)
+    {
+        AudioSource nextMusic = null;
+        if (inOffice)
+        {
+            nextMusic = officeMood switch
+            {
+                0 => musicNeutral,
+                EduardMistakeLimit => musicHorror,
+                _ => musicTense,
+            };
+        }
+
+        if (currentMusic == nextMusic)
+            return;
+
+        if (currentMusic != null)
+            currentMusic.Stop();
+
+        currentMusic = nextMusic;
+        if (currentMusic != null && currentMusic.clip != null && currentMusic.isActiveAndEnabled)
+            currentMusic.Play();
     }
 
     private bool HasTarget(string targetId)
@@ -439,6 +550,11 @@ public sealed class DialogueManager : MonoBehaviour
         if (!isActiveAndEnabled || !advanceArea.isActiveAndEnabled || !advanceArea.interactable)
             return;
 
+        AdvanceToNextNode();
+    }
+
+    private void AdvanceToNextNode()
+    {
         if (CanGoForward)
             GoForward();
         else
@@ -467,6 +583,9 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (currentMusic != null)
+            currentMusic.Stop();
+
         if (advanceArea != null)
             advanceArea.onClick.RemoveListener(Advance);
         if (backButton != null)
