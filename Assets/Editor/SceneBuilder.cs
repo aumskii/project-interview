@@ -36,7 +36,7 @@ public static class SceneBuilder
         TMP_FontAsset font = TMP_Settings.defaultFontAsset;
         VisualManager.CharacterTrim[] characterTrims = ReadCharacterTrims();
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        CreateCamera();
+        CameraShake cameraShake = CreateCamera();
         CreateEventSystem();
 
         var canvasObject = new GameObject("VN Canvas", typeof(RectTransform), typeof(Canvas),
@@ -50,6 +50,7 @@ public static class SceneBuilder
 
         Image background = CreateImage(canvas, "Background", Color.black);
         SetRect(background.rectTransform, 0f, 0f, 1f, 1f);
+        cameraShake.Configure(background.rectTransform);
 
         Image character = CreateImage(canvas, "Character", Color.white);
         RectTransform characterRect = character.rectTransform;
@@ -98,16 +99,49 @@ public static class SceneBuilder
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = false;
 
-        Button choiceTemplate = CreateChoiceButton(canvas, font);
+        Button choiceTemplate = CreateChoiceButton(canvas, "Choice Button Template", font);
         var choiceSize = choiceTemplate.gameObject.AddComponent<LayoutElement>();
         choiceSize.minHeight = 48f;
         choiceSize.preferredHeight = 66f;
         choiceTemplate.gameObject.SetActive(false);
 
+        Image baton = CreateImage(canvas, "Baton Impact", Color.white);
+        baton.preserveAspect = true;
+        baton.gameObject.SetActive(false);
+
+        RectTransform gameOverPanel = CreateRect(canvas, "GameOverPanel");
+        SetRect(gameOverPanel, 0f, 0f, 1f, 1f);
+
+        Image blackout = CreateImage(gameOverPanel, "Blackout", Color.black);
+        blackout.raycastTarget = true;
+        SetRect(blackout.rectTransform, 0f, 0f, 1f, 1f);
+        var blackoutFade = blackout.gameObject.AddComponent<CanvasGroup>();
+        blackoutFade.alpha = 0f;
+
+        TextMeshProUGUI gameOverTitle = CreateText(gameOverPanel, "Game Over Title", font, 136f);
+        gameOverTitle.text = "ВАС ВЫГНАЛИ";
+        gameOverTitle.color = Color.white;
+        gameOverTitle.fontStyle = FontStyles.Bold;
+        gameOverTitle.alignment = TextAlignmentOptions.Center;
+        SetRect(gameOverTitle.rectTransform, 0.04f, 0.36f, 0.96f, 0.64f);
+        var titleFade = gameOverTitle.gameObject.AddComponent<CanvasGroup>();
+        titleFade.alpha = 0f;
+
+        Button retry = CreateChoiceButton(gameOverPanel, "Retry Button", font);
+        retry.GetComponentInChildren<TMP_Text>().text = "Попробовать снова";
+        SetRect((RectTransform)retry.transform, 0.30f, 0.105f, 0.70f, 0.18f);
+        retry.interactable = false;
+        var retryFade = retry.gameObject.AddComponent<CanvasGroup>();
+        retryFade.alpha = 0f;
+        retryFade.blocksRaycasts = false;
+        gameOverPanel.gameObject.SetActive(false);
+
         var systems = new GameObject("VN Systems");
         systems.AddComponent<VisualManager>().Configure(background, character, characterTrims);
-        systems.AddComponent<DialogueManager>().Configure(speaker, dialogue, choices, choiceTemplate,
+        var manager = systems.AddComponent<DialogueManager>();
+        manager.Configure(panel.gameObject, speaker, dialogue, choices, choiceTemplate,
             advanceArea, continueIndicator, back, forward);
+        manager.ConfigureGameOver(gameOverPanel.gameObject, baton, blackoutFade, titleFade, retry, retryFade, cameraShake);
 
         if (!EditorSceneManager.SaveScene(scene, ScenePath))
         {
@@ -185,7 +219,7 @@ public static class SceneBuilder
         }
     }
 
-    private static void CreateCamera()
+    private static CameraShake CreateCamera()
     {
         var cameraObject = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener),
             typeof(CameraShake));
@@ -195,6 +229,7 @@ public static class SceneBuilder
         camera.orthographic = true;
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = Color.black;
+        return cameraObject.GetComponent<CameraShake>();
     }
 
     private static void CreateEventSystem()
@@ -280,9 +315,9 @@ public static class SceneBuilder
         return button;
     }
 
-    private static Button CreateChoiceButton(Transform parent, TMP_FontAsset font)
+    private static Button CreateChoiceButton(Transform parent, string name, TMP_FontAsset font)
     {
-        Image image = CreateImage(parent, "Choice Button Template", Color.white);
+        Image image = CreateImage(parent, name, Color.white);
         image.raycastTarget = true;
         var button = image.gameObject.AddComponent<Button>();
         button.targetGraphic = image;

@@ -10,6 +10,9 @@ public sealed class DialogueNode
     public string characterSprite;
     public string nextNodeId;
     public Choice[] choices;
+    public string requiredFlag;
+    public string missingFlagNodeId;
+    public string retryNodeId;
 }
 
 [Serializable]
@@ -18,6 +21,7 @@ public sealed class Choice
     public string choiceText;
     public string nextNodeId;
     public string flagToSet;
+    public string mismatchNodeId;
 }
 
 [Serializable]

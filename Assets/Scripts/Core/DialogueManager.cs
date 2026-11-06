@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -10,7 +11,13 @@ public sealed class DialogueManager : MonoBehaviour
 {
     public const string DialoguePath = "Data/dialogue";
     private const float IndicatorPeriod = 1.2f;
+    private const float BatonTravelSeconds = 0.1f;
+    private const float ImpactBlackoutSeconds = 0.15f;
+    private const float GameOverTitleFadeSeconds = 1f;
+    private const float GameOverRetryDelaySeconds = 2f;
+    private const float GameOverRetryFadeSeconds = 0.35f;
 
+    [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TMP_Text speakerText;
     [SerializeField] private TMP_Text dialogueText;
     [SerializeField] private RectTransform choicesContainer;
@@ -19,6 +26,13 @@ public sealed class DialogueManager : MonoBehaviour
     [SerializeField] private Image continueIndicator;
     [SerializeField] private Button backButton;
     [SerializeField] private Button forwardButton;
+    [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private Image batonImage;
+    [SerializeField] private CanvasGroup blackoutFade;
+    [SerializeField] private CanvasGroup gameOverTitleFade;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private CanvasGroup retryFade;
+    [SerializeField] private CameraShake cameraShake;
     [SerializeField, Min(1f)] private float charactersPerSecond = 52f;
 
     private readonly Dictionary<string, DialogueNode> nodes =
@@ -28,6 +42,7 @@ public sealed class DialogueManager : MonoBehaviour
         new List<(DialogueNode Node, string ChoiceFlag)>();
 
     private VisualManager visuals;
+    private Coroutine gameOverSequence;
     private DialogueNode currentNode;
     private int historyIndex = -1;
     private int lineLength;
@@ -35,10 +50,12 @@ public sealed class DialogueManager : MonoBehaviour
     private float indicatorStartedAt;
 
     private bool CanGoForward => historyIndex < history.Count - 1;
+    private bool IsRetryNode => !string.IsNullOrWhiteSpace(currentNode?.retryNodeId);
 
-    public void Configure(TMP_Text speaker, TMP_Text line, RectTransform choices,
+    public void Configure(GameObject panel, TMP_Text speaker, TMP_Text line, RectTransform choices,
         Button choiceTemplate, Button advance, Image indicator, Button back, Button forward)
     {
+        dialoguePanel = panel;
         speakerText = speaker;
         dialogueText = line;
         choicesContainer = choices;
@@ -49,11 +66,25 @@ public sealed class DialogueManager : MonoBehaviour
         forwardButton = forward;
     }
 
+    public void ConfigureGameOver(GameObject panel, Image baton, CanvasGroup blackout, CanvasGroup title,
+        Button retry, CanvasGroup retryGroup, CameraShake shake)
+    {
+        gameOverPanel = panel;
+        batonImage = baton;
+        blackoutFade = blackout;
+        gameOverTitleFade = title;
+        retryButton = retry;
+        retryFade = retryGroup;
+        cameraShake = shake;
+    }
+
     private void Start()
     {
-        if (speakerText == null || dialogueText == null || choicesContainer == null ||
+        if (dialoguePanel == null || speakerText == null || dialogueText == null || choicesContainer == null ||
             advanceArea == null || continueIndicator == null || choiceButtonTemplate == null ||
-            backButton == null || forwardButton == null ||
+            backButton == null || forwardButton == null || gameOverPanel == null || batonImage == null ||
+            blackoutFade == null || gameOverTitleFade == null || retryButton == null || retryFade == null ||
+            cameraShake == null ||
             choiceButtonTemplate.GetComponentInChildren<TMP_Text>(true) == null)
         {
             Debug.LogError("Dialogue UI bindings are incomplete. Rebuild the scene via Tools > Build VN Scene.", this);
@@ -74,6 +105,7 @@ public sealed class DialogueManager : MonoBehaviour
         advanceArea.onClick.AddListener(Advance);
         backButton.onClick.AddListener(GoBack);
         forwardButton.onClick.AddListener(GoForward);
+        retryButton.onClick.AddListener(Retry);
         ShowNode(entryNodeId);
     }
 
@@ -122,19 +154,70 @@ public sealed class DialogueManager : MonoBehaviour
 
     public void ShowNode(string nodeId) => VisitNode(nodeId, null);
 
+    public void RestartFromNode(string nodeId)
+    {
+        int checkpointIndex = history.FindLastIndex(historyIndex, entry => entry.Node.id == nodeId);
+        if (!TryResolveNode(nodeId, checkpointIndex, null, out DialogueNode node))
+            return;
+
+        historyIndex = checkpointIndex;
+        DiscardForwardHistory();
+        if (checkpointIndex >= 0 && history[checkpointIndex].Node == node)
+            DisplayNode(node, showImmediately: false);
+        else
+            EnterNode(node, null);
+    }
+
     private void VisitNode(string nodeId, string choiceFlag)
     {
-        if (string.IsNullOrWhiteSpace(nodeId) || !nodes.TryGetValue(nodeId, out DialogueNode node))
-        {
-            Debug.LogWarning($"Dialogue node '{nodeId}' was not found.", this);
+        if (!TryResolveNode(nodeId, historyIndex, choiceFlag, out DialogueNode node))
             return;
-        }
 
         DiscardForwardHistory();
+        EnterNode(node, choiceFlag);
+    }
+
+    private void EnterNode(DialogueNode node, string choiceFlag)
+    {
         FlagsManager.Instance.AddChoiceFlag(choiceFlag);
         history.Add((node, choiceFlag));
         historyIndex = history.Count - 1;
         DisplayNode(node, showImmediately: false);
+    }
+
+    private bool TryResolveNode(string nodeId, int lastKeptIndex, string choiceFlag, out DialogueNode node)
+    {
+        for (int remaining = nodes.Count; remaining > 0; remaining--)
+        {
+            if (string.IsNullOrWhiteSpace(nodeId) || !nodes.TryGetValue(nodeId, out node))
+            {
+                Debug.LogWarning($"Dialogue node '{nodeId}' was not found.", this);
+                node = null;
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(node.requiredFlag) || node.requiredFlag == choiceFlag ||
+                HasFlagAt(node.requiredFlag, lastKeptIndex))
+                return true;
+
+            nodeId = node.missingFlagNodeId;
+        }
+
+        Debug.LogWarning($"Could not resolve dialogue node '{nodeId}'. Check the flag redirects.", this);
+        node = null;
+        return false;
+    }
+
+    private bool HasFlagAt(string flag, int lastKeptIndex)
+    {
+        int discardedChoices = 0;
+        for (int i = lastKeptIndex + 1; i < history.Count; i++)
+        {
+            if (history[i].ChoiceFlag == flag)
+                discardedChoices++;
+        }
+
+        return FlagsManager.Instance.HasFlagAfterRemovingChoices(flag, discardedChoices);
     }
 
     private void DiscardForwardHistory()
@@ -151,6 +234,9 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void DisplayNode(DialogueNode node, bool showImmediately)
     {
+        if (IsRetryNode)
+            ResetGameOverPresentation();
+
         SetContinuationVisible(false);
         foreach (Button button in choiceButtons)
         {
@@ -161,6 +247,19 @@ public sealed class DialogueManager : MonoBehaviour
 
         currentNode = node;
         visuals.SetBackground(node.background);
+        if (IsRetryNode)
+        {
+            visuals.SetCharacterSprite(null);
+            lineLength = 0;
+            visibleCharacters = 0f;
+            backButton.interactable = false;
+            forwardButton.interactable = false;
+            forwardButton.gameObject.SetActive(false);
+            gameOverSequence = StartCoroutine(PlayGameOverSequence());
+            return;
+        }
+
+        dialoguePanel.SetActive(true);
         visuals.SetCharacterSprite(node.characterSprite);
         speakerText.text = node.characterName ?? string.Empty;
 
@@ -176,6 +275,81 @@ public sealed class DialogueManager : MonoBehaviour
 
         if (visibleCharacters >= lineLength)
             ShowActions();
+    }
+
+    private IEnumerator PlayGameOverSequence()
+    {
+        dialoguePanel.SetActive(false);
+        batonImage.sprite = VisualManager.LoadCharacterSprite(currentNode.characterSprite);
+        if (batonImage.sprite != null)
+        {
+            RectTransform batonRect = batonImage.rectTransform;
+            var leftCenter = new Vector2(0f, 0.5f);
+            batonRect.anchorMin = batonRect.anchorMax = batonRect.pivot = leftCenter;
+            batonRect.sizeDelta = new Vector2(2000f, 2000f);
+            batonRect.anchoredPosition = new Vector2(-1500f, 0f);
+            batonImage.color = new Color(1f, 1f, 1f, 0f);
+            batonImage.gameObject.SetActive(true);
+
+            float swingStartedAt = Time.unscaledTime;
+            for (float progress = 0f; progress < 1f; progress = (Time.unscaledTime - swingStartedAt) / BatonTravelSeconds)
+            {
+                batonRect.anchoredPosition = new Vector2(Mathf.SmoothStep(-1500f, 0f, progress), 0f);
+                batonImage.color = new Color(1f, 1f, 1f, Mathf.Clamp01(progress * 6f));
+                yield return null;
+            }
+
+            batonRect.anchoredPosition = Vector2.zero;
+        }
+
+        cameraShake.Shake(ImpactBlackoutSeconds, 0.30f);
+        batonImage.gameObject.SetActive(false);
+        blackoutFade.alpha = 0f;
+        gameOverTitleFade.alpha = 0f;
+        retryFade.alpha = 0f;
+        retryFade.blocksRaycasts = false;
+        retryButton.interactable = false;
+        gameOverPanel.SetActive(true);
+
+        float impactTime = Time.unscaledTime;
+        for (float elapsed = 0f; elapsed < GameOverTitleFadeSeconds; elapsed = Time.unscaledTime - impactTime)
+        {
+            blackoutFade.alpha = Mathf.Clamp01(elapsed / ImpactBlackoutSeconds);
+            gameOverTitleFade.alpha = elapsed / GameOverTitleFadeSeconds;
+            yield return null;
+        }
+
+        blackoutFade.alpha = 1f;
+        gameOverTitleFade.alpha = 1f;
+        yield return new WaitForSecondsRealtime(GameOverRetryDelaySeconds);
+
+        float retryStartedAt = Time.unscaledTime;
+        for (float elapsed = 0f; elapsed < GameOverRetryFadeSeconds; elapsed = Time.unscaledTime - retryStartedAt)
+        {
+            retryFade.alpha = elapsed / GameOverRetryFadeSeconds;
+            yield return null;
+        }
+
+        retryFade.alpha = 1f;
+        retryButton.interactable = HasTarget(currentNode.retryNodeId);
+        retryFade.blocksRaycasts = retryButton.interactable;
+        gameOverSequence = null;
+    }
+
+    private void ResetGameOverPresentation()
+    {
+        if (gameOverSequence != null)
+        {
+            StopCoroutine(gameOverSequence);
+            gameOverSequence = null;
+        }
+
+        cameraShake.StopShake();
+        batonImage.gameObject.SetActive(false);
+        batonImage.sprite = null;
+        gameOverPanel.SetActive(false);
+        retryButton.interactable = false;
+        retryFade.blocksRaycasts = false;
     }
 
     private void Update()
@@ -215,13 +389,26 @@ public sealed class DialogueManager : MonoBehaviour
 
             Button button = Instantiate(choiceButtonTemplate, choicesContainer, false);
             button.GetComponentInChildren<TMP_Text>(true).text = choice.choiceText ?? string.Empty;
-            button.interactable = HasTarget(choice.nextNodeId);
+            button.interactable = HasTarget(choice.nextNodeId) &&
+                (string.IsNullOrWhiteSpace(choice.mismatchNodeId) || HasTarget(choice.mismatchNodeId));
             if (button.interactable)
-                button.onClick.AddListener(() => VisitNode(choice.nextNodeId, choice.flagToSet));
+                button.onClick.AddListener(() => SelectChoice(choice));
 
             choiceButtons.Add(button);
             button.gameObject.SetActive(true);
         }
+    }
+
+    private void SelectChoice(Choice choice)
+    {
+        if (string.IsNullOrWhiteSpace(choice.mismatchNodeId))
+        {
+            VisitNode(choice.nextNodeId, choice.flagToSet);
+            return;
+        }
+
+        string target = HasFlagAt(choice.flagToSet, historyIndex) ? choice.nextNodeId : choice.mismatchNodeId;
+        VisitNode(target, null);
     }
 
     private bool HasTarget(string targetId)
@@ -262,10 +449,16 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void GoForward() => MoveInHistory(1);
 
+    private void Retry()
+    {
+        if (isActiveAndEnabled && retryButton.isActiveAndEnabled && retryButton.interactable)
+            RestartFromNode(currentNode.retryNodeId);
+    }
+
     private void MoveInHistory(int offset)
     {
         int target = historyIndex + offset;
-        if (!isActiveAndEnabled || target < 0 || target >= history.Count)
+        if (!isActiveAndEnabled || IsRetryNode || target < 0 || target >= history.Count)
             return;
 
         historyIndex = target;
@@ -280,5 +473,7 @@ public sealed class DialogueManager : MonoBehaviour
             backButton.onClick.RemoveListener(GoBack);
         if (forwardButton != null)
             forwardButton.onClick.RemoveListener(GoForward);
+        if (retryButton != null)
+            retryButton.onClick.RemoveListener(Retry);
     }
 }

@@ -291,22 +291,22 @@
         {
           "choiceText": "Руководителем отдела",
           "nextNodeId": "rec_five_boss",
-          "flagToSet": ""
+          "flagToSet": "said_five_boss"
         },
         {
           "choiceText": "Хочу работать с людьми",
           "nextNodeId": "rec_five_people",
-          "flagToSet": ""
+          "flagToSet": "said_five_people"
         },
         {
           "choiceText": "Живым",
           "nextNodeId": "rec_five_alive",
-          "flagToSet": ""
+          "flagToSet": "said_five_alive"
         },
         {
           "choiceText": "Не люблю загадывать",
           "nextNodeId": "rec_five_guess",
-          "flagToSet": ""
+          "flagToSet": "said_five_guess"
         }
       ]
     },
@@ -436,35 +436,385 @@
       "text": "Всё, идите. И это… удачи. Правда.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
-      "nextNodeId": "corridor_transition",
+      "nextNodeId": "corridor_1",
       "choices": []
     },
     {
-      "id": "corridor_transition",
+      "id": "corridor_1",
       "characterName": "",
-      "text": "Нельзя врать? К чему это она? А что будет, если совру? Да нет. Бред. Она просто предупредила. Наверное.",
+      "text": "Нельзя врать? К чему это она? А что будет, если совру?",
       "background": "bg_corridor_turnstile",
       "characterSprite": "",
-      "nextNodeId": "corridor_transition_2",
+      "nextNodeId": "corridor_2",
       "choices": []
     },
     {
-      "id": "corridor_transition_2",
+      "id": "corridor_2",
+      "characterName": "",
+      "text": "Да нет. Бред. Она просто предупредила. Наверное.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "",
+      "nextNodeId": "corridor_3",
+      "choices": []
+    },
+    {
+      "id": "corridor_3",
       "characterName": "",
       "text": "Впереди турникет. У турникета стоит охранник. Не двигается. Смотрит в планшет.",
       "background": "bg_corridor_turnstile",
       "characterSprite": "",
-      "nextNodeId": "END_OF_ACT_1",
+      "nextNodeId": "tolik_meet_1",
       "choices": []
     },
     {
-      "id": "END_OF_ACT_1",
+      "id": "tolik_meet_1",
+      "characterName": "Толик",
+      "text": "Слава. На 14:00. Долго шли?",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Нормально",
+          "nextNodeId": "tolik_meet_ok",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А вы откуда знаете, что я шел?",
+          "nextNodeId": "tolik_meet_ok2",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А какая разница?",
+          "nextNodeId": "tolik_game_over",
+          "flagToSet": ""
+        }
+      ]
+    },
+    {
+      "id": "tolik_meet_ok",
+      "characterName": "Толик",
+      "text": "Мне сказали, вы весёлый. Или это про другого. Не помню. Ладно.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_q1",
+      "choices": []
+    },
+    {
+      "id": "tolik_meet_ok2",
+      "characterName": "Толик",
+      "text": "Я всех вижу. Работа такая.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_meet_ok",
+      "choices": []
+    },
+    {
+      "id": "tolik_q1",
+      "characterName": "Толик",
+      "text": "Почему ушли с прошлой работы?",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Хотел расти",
+          "nextNodeId": "tolik_q2",
+          "flagToSet": "said_grow",
+          "mismatchNodeId": "tolik_lie"
+        },
+        {
+          "choiceText": "Конфликт с руководством",
+          "nextNodeId": "tolik_q2",
+          "flagToSet": "said_conflict",
+          "mismatchNodeId": "tolik_lie"
+        },
+        {
+          "choiceText": "Сократили",
+          "nextNodeId": "tolik_q2",
+          "flagToSet": "said_cut",
+          "mismatchNodeId": "tolik_lie"
+        },
+        {
+          "choiceText": "Меня уволили",
+          "nextNodeId": "tolik_q2",
+          "flagToSet": "said_fired",
+          "mismatchNodeId": "tolik_lie"
+        }
+      ]
+    },
+    {
+      "id": "tolik_lie",
+      "characterName": "Толик",
+      "text": "А на входе вы сказали иначе",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "tolik_game_over",
+      "choices": []
+    },
+    {
+      "id": "tolik_q2",
+      "characterName": "Толик",
+      "text": "Колюще-режущее есть?",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Только язык",
+          "nextNodeId": "tolik_q2_lang",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Нож для масла в кармане. Привычка",
+          "nextNodeId": "tolik_q2_knife",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А что нужно?",
+          "nextNodeId": "tolik_q2_what",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Есть два ножа. Хочу всех перерезать",
+          "nextNodeId": "tolik_hmm",
+          "flagToSet": ""
+        }
+      ]
+    },
+    {
+      "id": "tolik_hmm",
+      "characterName": "Толик",
+      "text": "Хм...",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "tolik_game_over",
+      "choices": []
+    },
+    {
+      "id": "tolik_q2_lang",
+      "characterName": "Толик",
+      "text": "Язык — это опасно. Но пронесём.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_q3",
+      "choices": []
+    },
+    {
+      "id": "tolik_q2_knife",
+      "characterName": "Толик",
+      "text": "Оставьте на стойке. Потом заберёте. Или не заберёте.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_q3",
+      "choices": []
+    },
+    {
+      "id": "tolik_q2_what",
+      "characterName": "Толик",
+      "text": "Ничего не нужно. Это я спрашиваю. А вы уже думаете, что нужно.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_q3",
+      "choices": []
+    },
+    {
+      "id": "tolik_q3",
+      "characterName": "Толик",
+      "text": "Кем видите себя через пять лет?",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Руководителем отдела",
+          "nextNodeId": "tolik_q4",
+          "flagToSet": "said_five_boss",
+          "mismatchNodeId": "tolik_lie"
+        },
+        {
+          "choiceText": "Хочу работать с людьми",
+          "nextNodeId": "tolik_q4",
+          "flagToSet": "said_five_people",
+          "mismatchNodeId": "tolik_lie"
+        },
+        {
+          "choiceText": "Живым",
+          "nextNodeId": "tolik_q4",
+          "flagToSet": "said_five_alive",
+          "mismatchNodeId": "tolik_lie"
+        },
+        {
+          "choiceText": "Не люблю загадывать",
+          "nextNodeId": "tolik_q4",
+          "flagToSet": "said_five_guess",
+          "mismatchNodeId": "tolik_lie"
+        }
+      ]
+    },
+    {
+      "id": "tolik_q4",
+      "characterName": "Толик",
+      "text": "Говорят, вы стрессоустойчивый. Это правда?",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_looking",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Да, правда",
+          "nextNodeId": "tolik_game_over",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Промолчать",
+          "nextNodeId": "tolik_q4_ok1",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "Ну, не то чтобы...",
+          "nextNodeId": "tolik_q4_ok2",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А вы проверять будете?",
+          "nextNodeId": "tolik_q4_ok3",
+          "flagToSet": ""
+        }
+      ],
+      "requiredFlag": "said_stressproof",
+      "missingFlagNodeId": "tolik_end"
+    },
+    {
+      "id": "tolik_q4_ok1",
+      "characterName": "Толик",
+      "text": "Молчите. Правильно. Не врёте — уже хорошо.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_end_choices",
+      "choices": []
+    },
+    {
+      "id": "tolik_q4_ok2",
+      "characterName": "Толик",
+      "text": "Честно. Запомнил.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_end_choices",
+      "choices": []
+    },
+    {
+      "id": "tolik_q4_ok3",
+      "characterName": "Толик",
+      "text": "Может быть. Пока нет. Но запомнил.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "tolik_end_choices",
+      "choices": []
+    },
+    {
+      "id": "tolik_end",
+      "characterName": "Толик",
+      "text": "Кабинет 13. Третий этаж, направо, до конца.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Спасибо",
+          "nextNodeId": "tolik_end_ok1",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А что в кабинете 13?",
+          "nextNodeId": "tolik_end_ok2",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А если не пройду?",
+          "nextNodeId": "tolik_end_ok3",
+          "flagToSet": ""
+        }
+      ]
+    },
+    {
+      "id": "tolik_end_choices",
+      "characterName": "Толик",
+      "text": "Кабинет 13. Третий этаж, направо, до конца.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "",
+      "choices": [
+        {
+          "choiceText": "Спасибо",
+          "nextNodeId": "tolik_end_ok1",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А что в кабинете 13?",
+          "nextNodeId": "tolik_end_ok2",
+          "flagToSet": ""
+        },
+        {
+          "choiceText": "А если не пройду?",
+          "nextNodeId": "tolik_end_ok3",
+          "flagToSet": ""
+        }
+      ]
+    },
+    {
+      "id": "tolik_end_ok1",
+      "characterName": "Толик",
+      "text": "Не за что. Удачи. Она тут нужна.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "elevator_transition",
+      "choices": []
+    },
+    {
+      "id": "tolik_end_ok2",
+      "characterName": "Толик",
+      "text": "Увидите. Или не увидите. Как получится.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "elevator_transition",
+      "choices": []
+    },
+    {
+      "id": "tolik_end_ok3",
+      "characterName": "Толик",
+      "text": "Тогда обратно через меня. И без ножей.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_base",
+      "nextNodeId": "elevator_transition",
+      "choices": []
+    },
+    {
+      "id": "elevator_transition",
+      "characterName": "",
+      "text": "Лифт. Тринадцатый этаж. Двери закрываются.",
+      "background": "bg_elevator",
+      "characterSprite": "",
+      "nextNodeId": "END_OF_ACT_2",
+      "choices": []
+    },
+    {
+      "id": "END_OF_ACT_2",
       "characterName": "",
       "text": "",
-      "background": "bg_corridor_turnstile",
+      "background": "bg_elevator",
       "characterSprite": "",
       "nextNodeId": "",
       "choices": []
+    },
+    {
+      "id": "tolik_game_over",
+      "characterName": "Толик",
+      "text": "Вас выгнали.",
+      "background": "bg_corridor_turnstile",
+      "characterSprite": "tolik_baton_hit",
+      "nextNodeId": "",
+      "choices": [],
+      "retryNodeId": "corridor_1"
     }
   ]
 }
