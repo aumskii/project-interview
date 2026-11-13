@@ -21,7 +21,7 @@
     {
       "id": "alarm_2",
       "characterName": "",
-      "text": "Собеседование.",
+      "text": "Наконец-то, собеседование...",
       "background": "bg_bedroom",
       "characterSprite": "slava_home_sleepy_clean",
       "nextNodeId": "alarm_3",
@@ -30,7 +30,7 @@
     {
       "id": "alarm_3",
       "characterName": "",
-      "text": "В 14:00. Не проспать.",
+      "text": "В 14:00. Ни в коем случае нельзя опаздывать.",
       "background": "bg_bedroom",
       "characterSprite": "slava_home_sleepy_clean",
       "nextNodeId": "mirror_1",
@@ -39,7 +39,7 @@
     {
       "id": "mirror_1",
       "characterName": "",
-      "text": "Так. Нормально.",
+      "text": "Так. Рубашка наглажена, взгляд уверенный. Сегодня точно мой день. Я справлюсь.",
       "background": "bg_mirror",
       "characterSprite": "",
       "nextNodeId": "mirror_2",
@@ -57,7 +57,7 @@
     {
       "id": "mirror_3",
       "characterName": "",
-      "text": "Все врут на собеседованиях. Это нормально. Наверное.",
+      "text": "Хотя... все врут на собеседованиях. Это нормально, ну, наверное.",
       "background": "bg_mirror",
       "characterSprite": "",
       "nextNodeId": "flashback_1",
@@ -66,7 +66,7 @@
     {
       "id": "flashback_1",
       "characterName": "",
-      "text": "Три недели назад.",
+      "text": "Три недели назад...",
       "background": "bg_laptop",
       "characterSprite": "",
       "nextNodeId": "flashback_2",
@@ -75,7 +75,7 @@
     {
       "id": "flashback_2",
       "characterName": "",
-      "text": "«Мы вынуждены».",
+      "text": "«К сожалению, мы вынуждены с вами попрощаться».",
       "background": "bg_laptop",
       "characterSprite": "",
       "nextNodeId": "flashback_3",
@@ -84,7 +84,7 @@
     {
       "id": "flashback_3",
       "characterName": "",
-      "text": "«Не по вашей вине».",
+      "text": "«Вы отличный специалист, но...».",
       "background": "bg_laptop",
       "characterSprite": "",
       "nextNodeId": "flashback_4",
@@ -93,7 +93,7 @@
     {
       "id": "flashback_4",
       "characterName": "",
-      "text": "«Сокращение».",
+      "text": "«реалии рынка диктуют свои условия. Ничего личного».",
       "background": "bg_laptop",
       "characterSprite": "",
       "nextNodeId": "mirror_return_1",
@@ -102,7 +102,7 @@
     {
       "id": "mirror_return_1",
       "characterName": "",
-      "text": "Формально — сокращение. Неформально — мы просто не сошлись.",
+      "text": "Формально — сокращение штата. Неформально — на моё место решили взять «своего» человека...",
       "background": "bg_mirror",
       "characterSprite": "",
       "nextNodeId": "mirror_return_2",
@@ -129,7 +129,7 @@
     {
       "id": "park_2",
       "characterName": "",
-      "text": "Может, это знак?",
+      "text": "Может, это знак? Очень надеюсь...",
       "background": "bg_park",
       "characterSprite": "",
       "nextNodeId": "park_3",
@@ -138,7 +138,7 @@
     {
       "id": "park_3",
       "characterName": "",
-      "text": "Вон уже и вход в офис виднеется. Стеклянные двери, всё как положено.",
+      "text": "Вон и офис виднеется. Какое же огромное здание...",
       "background": "bg_park",
       "characterSprite": "",
       "nextNodeId": "lobby_1",
@@ -147,7 +147,7 @@
     {
       "id": "lobby_1",
       "characterName": "",
-      "text": "Ну вот. Приехали.",
+      "text": "Ну и офис... Стекло, бетон. Выглядит очень дорого. Даже как-то не по себе стало...",
       "background": "bg_office_entrance",
       "characterSprite": "",
       "nextNodeId": "lobby_2",
@@ -156,7 +156,7 @@
     {
       "id": "lobby_2",
       "characterName": "",
-      "text": "Просто собеседование. Да.",
+      "text": "Так, спокойно, это просто собеседование. Просто собеседование.",
       "background": "bg_office_entrance",
       "characterSprite": "",
       "nextNodeId": "reception_1",
@@ -165,7 +165,7 @@
     {
       "id": "reception_1",
       "characterName": "Инга",
-      "text": "Ой, здравствуйте! Вы Слава? На 14:00? Кстати, вы видели, какая погода сегодня? Просто отличная! Солнце, птички. Значит, и собеседование у вас пройдёт хорошо. Примета такая. Ну, присаживайтесь, водички?",
+      "text": "Ой, здравствуйте! Вы Слава? На 14:00? Ну, присаживайтесь, водички? Кстати, вы видели, какая погода сегодня? Просто отличная! Солнце, птички. Значит, и собеседование у вас пройдёт хорошо.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "",
@@ -176,7 +176,7 @@
           "flagToSet": "weather_good"
         },
         {
-          "choiceText": "А если дождь — то и собеседование плохое? Так и работу выбираете?",
+          "choiceText": "А если дождь — то и собеседование плохое? Так на работу и принимаете?",
           "nextNodeId": "reception_1_snark",
           "flagToSet": "weather_snark"
         },
@@ -190,7 +190,7 @@
     {
       "id": "reception_1_good",
       "characterName": "Инга",
-      "text": "Вот! Я же говорю — примета. Такие люди нам и нужны, которые замечают хорошее.",
+      "text": "Правда? Ну, значит, точно всё пройдет хорошо!",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_2",
@@ -265,7 +265,7 @@
     {
       "id": "rec_why_conflict",
       "characterName": "Инга",
-      "text": "О, честно. Люблю, когда честно. С начальниками и у нас тут… бывает сложно.",
+      "text": "О, понимаю вас. С начальниками и у нас тут… бывает сложно.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "rec_why_conflict_2",
@@ -274,7 +274,7 @@
     {
       "id": "rec_why_conflict_2",
       "characterName": "Инга",
-      "text": "Но вы держитесь.",
+      "text": "Но может вам повезёт.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_3",
@@ -283,7 +283,7 @@
     {
       "id": "rec_why_cut",
       "characterName": "Инга",
-      "text": "Ой, сочувствую. У нас тоже сокращали. Двоих.",
+      "text": "Ой, сочувствую... У нас тут тоже недавно было сокращение.",
       "background": "bg_reception",
       "characterSprite": "inga_awkward",
       "nextNodeId": "rec_why_cut_2",
@@ -292,7 +292,7 @@
     {
       "id": "rec_why_cut_2",
       "characterName": "Инга",
-      "text": "Но это было давно.",
+      "text": "Двоих уволили. Но сейчас вроде набираем новых, так что не переживайте.",
       "background": "bg_reception",
       "characterSprite": "inga_awkward",
       "nextNodeId": "reception_3",
@@ -301,7 +301,7 @@
     {
       "id": "rec_why_fired",
       "characterName": "Инга",
-      "text": "Уволили. Прямо так и говорите. Смело. Ну, у нас тут тоже… всякое бывает.",
+      "text": "Уволили? Прямо так и говорите — это смело. Обычно тут все пытаются выкрутиться.",
       "background": "bg_reception",
       "characterSprite": "inga_surprised",
       "nextNodeId": "rec_why_fired_2",
@@ -310,7 +310,7 @@
     {
       "id": "rec_why_fired_2",
       "characterName": "Инга",
-      "text": "Главное — не врать.",
+      "text": "Ну, у нас тут тоже всякое бывает.",
       "background": "bg_reception",
       "characterSprite": "inga_surprised",
       "nextNodeId": "reception_3",
@@ -319,7 +319,7 @@
     {
       "id": "reception_3",
       "characterName": "Инга",
-      "text": "А кем себя видите через пять лет? Только честно, а то все говорят «руководителем», а потом уходят.",
+      "text": "А кем себя видите через пять лет? Только честно, а то все говорят «руководителем», а потом уходят через неделю.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "",
@@ -349,7 +349,7 @@
     {
       "id": "rec_five_boss",
       "characterName": "Инга",
-      "text": "О, амбициозно. Только тут, чтобы дорасти до руководителя, нужно сначала выжить на собеседовании у нашего директора.",
+      "text": "Амбициозно! Только чтобы у нас дорасти до руководителя, вам сначала придется очаровать нашего директора.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "rec_five_boss_2",
@@ -358,7 +358,7 @@
     {
       "id": "rec_five_boss_2",
       "characterName": "Инга",
-      "text": "А он, скажем так… своеобразный.",
+      "text": "А он, скажем так… своеобразный. Так что удачи вам.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_4",
@@ -367,7 +367,7 @@
     {
       "id": "rec_five_people",
       "characterName": "Инга",
-      "text": "Ой, с людьми — это вы по адресу. Бумажек у нас тоже хватает,",
+      "text": "С людьми, значит... Ну, в нашем офисе людей много. Правда, половина из них — это ходячие проблемы.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "rec_five_people_2",
@@ -376,7 +376,7 @@
     {
       "id": "rec_five_people_2",
       "characterName": "Инга",
-      "text": "но люди… люди интереснее.",
+      "text": "Но если вы любите решать головоломки, то вам тут точно понравится.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_4",
@@ -385,7 +385,7 @@
     {
       "id": "rec_five_alive",
       "characterName": "Инга",
-      "text": "Ой, я это запишу. Нет, правда, запишу.",
+      "text": "Ха-ха! Ну да, тут это и правда главная карьерная цель.",
       "background": "bg_reception",
       "characterSprite": "inga_laugh",
       "nextNodeId": "reception_4",
@@ -403,7 +403,7 @@
     {
       "id": "rec_five_guess_2",
       "characterName": "Инга",
-      "text": "планы любят ломаться.",
+      "text": "Планы любят ломаться.",
       "background": "bg_reception",
       "characterSprite": "inga_awkward",
       "nextNodeId": "reception_4",
@@ -433,7 +433,7 @@
           "flagToSet": ""
         },
         {
-          "choiceText": "А что, уже начинается?",
+          "choiceText": "Вы сейчас меня запугать пытаетесь?",
           "nextNodeId": "rec_stress_what",
           "flagToSet": ""
         }
@@ -442,7 +442,7 @@
     {
       "id": "rec_stress_proof",
       "characterName": "Инга",
-      "text": "Ну и отлично. Записала.",
+      "text": "Это отлично. А то у нас тут всякое бывает. Записала.",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_5",
@@ -451,7 +451,7 @@
     {
       "id": "rec_stress_tea",
       "characterName": "Инга",
-      "text": "О, у нас на кухне печенье есть. Пока.",
+      "text": "Хорошо. У нас на кухне как раз есть печенье. Но только для сотрудников!",
       "background": "bg_reception",
       "characterSprite": "inga_base",
       "nextNodeId": "reception_5",
@@ -478,7 +478,7 @@
     {
       "id": "rec_stress_what",
       "characterName": "Инга",
-      "text": "Ещё нет. Но вы не расслабляйтесь.",
+      "text": "Нет-нет, что вы. Просто у нас важно уметь держать себя в руках. Очень важно.",
       "background": "bg_reception",
       "characterSprite": "inga_surprised",
       "nextNodeId": "reception_5",
@@ -496,7 +496,7 @@
     {
       "id": "inga_warning_1",
       "characterName": "Инга",
-      "text": "Ой, Слава, погодите! Я вам это не говорила, ладно? Просто… У нас в офисе нельзя врать. Вообще. Ни охранникам, ни там, дальше. Я про директора вообще молчу. Он такое не любит.",
+      "text": "Ой, Слава, погодите! Я вам это не говорила, ладно? Просто… У нас тут строго с честностью. Охранник на входе проверяет каждое слово, а директор... он просто не прощает вранья. Так что лучше говорите как есть.",
       "background": "bg_reception",
       "characterSprite": "inga_serious",
       "nextNodeId": "inga_warning_2",
@@ -514,7 +514,7 @@
     {
       "id": "corridor_1",
       "characterName": "",
-      "text": "Нельзя врать? К чему это она? А что будет, если совру?",
+      "text": "Строго с честностью? К чему это она? А что будет, если буду врать?",
       "background": "bg_corridor_turnstile",
       "characterSprite": "",
       "nextNodeId": "corridor_2",
@@ -523,7 +523,7 @@
     {
       "id": "corridor_2",
       "characterName": "",
-      "text": "Да нет. Бред. Она просто предупредила. Наверное.",
+      "text": "Бред. Кто в здравом уме будет проверять на честность? Она просто пошутила, наверное... ",
       "background": "bg_corridor_turnstile",
       "characterSprite": "",
       "nextNodeId": "corridor_3",
@@ -552,23 +552,23 @@
     {
       "id": "tolik_meet_1",
       "characterName": "Толик",
-      "text": "Слава. На 14:00. Долго шли?",
+      "text": "Так. Слава. На 14:00. Долго шли?",
       "background": "bg_corridor_turnstile",
       "characterSprite": "tolik_base",
       "nextNodeId": "",
       "choices": [
         {
-          "choiceText": "Нормально",
+          "choiceText": "Нет, не долго",
           "nextNodeId": "tolik_meet_ok",
           "flagToSet": ""
         },
         {
-          "choiceText": "А вы откуда знаете, что я шел?",
+          "choiceText": "А вы откуда знаете, что я шел? Может я бежал.",
           "nextNodeId": "tolik_meet_ok2",
           "flagToSet": ""
         },
         {
-          "choiceText": "А какая разница?",
+          "choiceText": "А вам какая разница?",
           "nextNodeId": "tolik_hamim",
           "flagToSet": ""
         }
@@ -596,7 +596,7 @@
     {
       "id": "tolik_meet_ok2",
       "characterName": "Толик",
-      "text": "Я всех вижу. Работа такая.",
+      "text": "Я всех вижу и всё знаю. Работа такая.",
       "background": "bg_corridor_turnstile",
       "characterSprite": "tolik_base",
       "nextNodeId": "tolik_meet_ok",
@@ -639,7 +639,7 @@
     {
       "id": "tolik_lie",
       "characterName": "Толик",
-      "text": "А на входе вы сказали иначе",
+      "text": "А на ресепшене вы сказали иначе...",
       "background": "bg_corridor_turnstile",
       "characterSprite": "tolik_looking",
       "nextNodeId": "tolik_game_over",
@@ -659,12 +659,12 @@
           "flagToSet": ""
         },
         {
-          "choiceText": "Нож для масла в кармане. Привычка",
+          "choiceText": "Нож для масла в кармане. Всегда с собой",
           "nextNodeId": "tolik_q2_knife",
           "flagToSet": ""
         },
         {
-          "choiceText": "А что нужно?",
+          "choiceText": "А должно быть?",
           "nextNodeId": "tolik_q2_what",
           "flagToSet": ""
         },
@@ -705,7 +705,7 @@
     {
       "id": "tolik_q2_what",
       "characterName": "Толик",
-      "text": "Ничего не нужно. Это я спрашиваю. А вы уже думаете, что нужно.",
+      "text": "Не должно. Но я обязан спрашивать. Стандартные правила безопасности.",
       "background": "bg_corridor_turnstile",
       "characterSprite": "tolik_base",
       "nextNodeId": "tolik_q3",
@@ -875,7 +875,7 @@
     {
       "id": "tolik_end_ok3",
       "characterName": "Толик",
-      "text": "Тогда обратно через меня. И без ножей.",
+      "text": "Тогда пройдете обратно через меня. И без ножей.",
       "background": "bg_corridor_turnstile",
       "characterSprite": "tolik_looking",
       "nextNodeId": "after_tolik_thought",
@@ -2000,7 +2000,7 @@
     {
       "id": "ending_death_1",
       "characterName": "",
-      "text": "Пол был мокрый.",
+      "text": "Чёрт, кажется, пол был мокрым...",
       "background": "bg_corridor_wet",
       "characterSprite": "slava_office_falling",
       "nextNodeId": "ending_death_2",
@@ -2036,7 +2036,7 @@
     {
       "id": "ending_secret_3",
       "characterName": "",
-      "text": "Наверное.",
+      "text": "Наверное...",
       "background": "bg_street",
       "characterSprite": "slava_office_smirk",
       "nextNodeId": "",

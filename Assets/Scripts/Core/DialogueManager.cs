@@ -18,9 +18,11 @@ public sealed class DialogueManager : MonoBehaviour
     private const float GameOverTitleFadeSeconds = 3f;
     private const float GameOverRetryDelaySeconds = 3f;
     private const float GameOverRetryFadeSeconds = 1.5f;
-    private const float FallDurationSeconds = 1.25f;
-    private const float FallCaptionSeconds = 2f;
+    private const float FallDurationSeconds = 1.75f;
+    private const float FallCaptionSeconds = 3f;
     private const float ElevatorPulsePeriod = 1.5f;
+    private const float EndingCharacterSeconds = 0.1f;
+    private const float EndingReadPauseSeconds = 5f;
     private const float EndingTextFadeSeconds = 1f;
     private const float CreditsScrollSpeed = 65f;
     private const string DeathEndingText =
@@ -492,13 +494,13 @@ public sealed class DialogueManager : MonoBehaviour
     }
 
     private void PlayDeathEnding() =>
-        finaleSequence = StartCoroutine(PlayEndingSequence(DeathEndingText, 3f, DeathEndingText));
+        finaleSequence = StartCoroutine(PlayEndingSequence(DeathEndingText, DeathEndingText));
 
     private void PlaySecretEnding() =>
-        finaleSequence = StartCoroutine(PlayEndingSequence(currentNode.text, 2f,
+        finaleSequence = StartCoroutine(PlayEndingSequence(currentNode.text,
             "Вы были внимательны. В этот раз."));
 
-    private IEnumerator PlayEndingSequence(string finalText, float pauseSeconds, string creditsEpilogue)
+    private IEnumerator PlayEndingSequence(string finalText, string creditsEpilogue)
     {
         isEnding = true;
         dialoguePanel.SetActive(false);
@@ -517,12 +519,12 @@ public sealed class DialogueManager : MonoBehaviour
         float typed = 0f;
         while (typed < length)
         {
-            typed = Mathf.Min(length, typed + Time.unscaledDeltaTime * Mathf.Max(1f, charactersPerSecond));
+            typed = Mathf.Min(length, typed + Time.unscaledDeltaTime / EndingCharacterSeconds);
             endingText.maxVisibleCharacters = (int)typed;
             yield return null;
         }
 
-        yield return new WaitForSecondsRealtime(pauseSeconds);
+        yield return new WaitForSecondsRealtime(EndingReadPauseSeconds);
         float fadeStartedAt = Time.unscaledTime;
         for (float elapsed = 0f; elapsed < EndingTextFadeSeconds; elapsed = Time.unscaledTime - fadeStartedAt)
         {
