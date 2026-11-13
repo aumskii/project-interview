@@ -18,6 +18,11 @@ public sealed class DialogueManager : MonoBehaviour
     private const float GameOverTitleFadeSeconds = 3f;
     private const float GameOverRetryDelaySeconds = 3f;
     private const float GameOverRetryFadeSeconds = 1.5f;
+    private const float FallDurationSeconds = 1.25f;
+    private const float EndingTextFadeSeconds = 1f;
+    private const float CreditsScrollSpeed = 65f;
+    private const string DeathEndingText =
+        "Даже когда кажется, что все проблемы позади, не забывайте смотреть под ноги.";
     private const int EduardMistakeLimit = 3;
     private const string EduardGameOverNodeId = "eduard_game_over";
 
@@ -50,6 +55,18 @@ public sealed class DialogueManager : MonoBehaviour
     [SerializeField] private AudioSource musicNeutral;
     [SerializeField] private AudioSource musicTense;
     [SerializeField] private AudioSource musicHorror;
+    [SerializeField] private Button wetSignButton;
+    [SerializeField] private GameObject creditsPanel;
+    [SerializeField] private TMP_Text endingText;
+    [SerializeField] private CanvasGroup endingTextFade;
+    [SerializeField] private TMP_Text creditsText;
+    [SerializeField] private RectTransform characterRect;
+    [SerializeField, TextArea(4, 20)] private string creditsContent =
+        "ИГРА «СОБЕСЕДОВАНИЕ»\n\n---\n\n" +
+        "Руководство компании: Эдуард Эдуардович\n\n" +
+        "Служба безопасности: Толик\n\n" +
+        "Отдел кадров: Инга\n\n" +
+        "Соискатель: Слава";
     [SerializeField, Min(1f)] private float charactersPerSecond = 52f;
 
     private readonly Dictionary<string, DialogueNode> nodes =
@@ -61,6 +78,10 @@ public sealed class DialogueManager : MonoBehaviour
     private VisualManager visuals;
     private AudioSource currentMusic;
     private Coroutine gameOverSequence;
+    private Coroutine finaleSequence;
+    private Vector2 characterRestPosition;
+    private bool isFalling;
+    private bool isEnding;
     private DialogueNode currentNode;
     private int historyIndex = -1;
     private int lineLength;
@@ -104,13 +125,25 @@ public sealed class DialogueManager : MonoBehaviour
         musicHorror = horror;
     }
 
+    public void ConfigureFinale(Button wetSign, GameObject panel, TMP_Text title,
+        CanvasGroup titleFade, TMP_Text credits, RectTransform character)
+    {
+        wetSignButton = wetSign;
+        creditsPanel = panel;
+        endingText = title;
+        endingTextFade = titleFade;
+        creditsText = credits;
+        characterRect = character;
+    }
+
     private void Start()
     {
         if (dialoguePanel == null || speakerText == null || dialogueText == null || choicesContainer == null ||
             advanceArea == null || continueIndicator == null || choiceButtonTemplate == null ||
             backButton == null || forwardButton == null || gameOverPanel == null || batonImage == null ||
             blackoutFade == null || gameOverTitleFade == null || retryButton == null || retryFade == null ||
-            cameraShake == null ||
+            cameraShake == null || wetSignButton == null || creditsPanel == null || endingText == null ||
+            endingTextFade == null || creditsText == null || characterRect == null ||
             choiceButtonTemplate.GetComponentInChildren<TMP_Text>(true) == null)
         {
             Debug.LogError("Dialogue UI bindings are incomplete. Rebuild the scene via Tools > Build VN Scene.", this);
@@ -119,6 +152,7 @@ public sealed class DialogueManager : MonoBehaviour
         }
 
         visuals = GetComponent<VisualManager>();
+        characterRestPosition = characterRect.anchoredPosition;
         SetContinuationVisible(false);
         choiceButtonTemplate.gameObject.SetActive(false);
 
@@ -132,6 +166,7 @@ public sealed class DialogueManager : MonoBehaviour
         backButton.onClick.AddListener(GoBack);
         forwardButton.onClick.AddListener(GoForward);
         retryButton.onClick.AddListener(Retry);
+        wetSignButton.onClick.AddListener(ChooseSecretEnding);
         ShowNode(entryNodeId);
     }
 
@@ -225,7 +260,7 @@ public sealed class DialogueManager : MonoBehaviour
                 return false;
             }
 
-            if (node.useEduardAtmosphere && !node.isEduardReaction &&
+            if ((node.useEduardAtmosphere || node.id == "finale_1") && !node.isEduardReaction &&
                 node.id != EduardGameOverNodeId && string.IsNullOrWhiteSpace(node.retryNodeId) &&
                 MistakeCountAt(lastKeptIndex) + (addsMistake ? 1 : 0) >= EduardMistakeLimit)
             {
@@ -297,6 +332,7 @@ public sealed class DialogueManager : MonoBehaviour
     private void DisplayNode(DialogueNode node, bool showImmediately)
     {
         autoAdvanceAt = null;
+        ResetFinalePresentation();
         if (IsRetryNode)
             ResetGameOverPresentation();
 
@@ -326,6 +362,17 @@ public sealed class DialogueManager : MonoBehaviour
             return;
         }
 
+        if (node.id == "ending_death_2" || node.id == "ending_secret_3")
+        {
+            lineLength = 0;
+            visibleCharacters = 0f;
+            if (node.id == "ending_death_2")
+                PlayDeathEnding();
+            else
+                PlaySecretEnding();
+            return;
+        }
+
         dialoguePanel.SetActive(true);
         visuals.SetCharacterSprite(node.useEduardAtmosphere ? EduardPortraits[officeMood] : node.characterSprite);
         speakerText.text = node.characterName ?? string.Empty;
@@ -335,13 +382,129 @@ public sealed class DialogueManager : MonoBehaviour
         dialogueText.ForceMeshUpdate();
         lineLength = dialogueText.textInfo.characterCount;
         visibleCharacters = showImmediately ? lineLength : 0f;
-        backButton.interactable = historyIndex > 0;
-        bool canGoForward = CanGoForward;
-        forwardButton.interactable = canGoForward;
-        forwardButton.gameObject.SetActive(canGoForward);
+        UpdateHistoryButtons();
+
+        if (node.id == "finale_3")
+            wetSignButton.gameObject.SetActive(true);
+
+        if (node.id == "ending_death_1")
+            finaleSequence = StartCoroutine(PlaySlowFallAnimation());
 
         if (visibleCharacters >= lineLength)
             ShowActions();
+    }
+
+    private void UpdateHistoryButtons()
+    {
+        backButton.interactable = historyIndex > 0 && !isFalling && !isEnding;
+        bool canGoForward = CanGoForward && !isFalling && !isEnding;
+        forwardButton.interactable = canGoForward;
+        forwardButton.gameObject.SetActive(canGoForward);
+    }
+
+    private IEnumerator PlaySlowFallAnimation()
+    {
+        isFalling = true;
+        UpdateHistoryButtons();
+        cameraShake.Shake(ImpactShakeSeconds, 0.30f);
+        Rect screen = ((RectTransform)characterRect.parent).rect;
+        Vector2 fallenPosition = characterRestPosition + new Vector2(screen.width * 0.22f, -screen.height * 1.1f);
+        float startedAt = Time.unscaledTime;
+        for (float progress = 0f; progress < 1f; progress = (Time.unscaledTime - startedAt) / FallDurationSeconds)
+        {
+            characterRect.anchoredPosition = Vector2.Lerp(characterRestPosition, fallenPosition, progress * progress);
+            yield return null;
+        }
+
+        characterRect.anchoredPosition = fallenPosition;
+        isFalling = false;
+        finaleSequence = null;
+        UpdateHistoryButtons();
+        if (visibleCharacters >= lineLength)
+            ShowActions();
+    }
+
+    private void ChooseSecretEnding()
+    {
+        if (isActiveAndEnabled && currentNode?.id == "finale_3" &&
+            wetSignButton.isActiveAndEnabled && wetSignButton.interactable)
+            ShowNode("ending_secret_1");
+    }
+
+    private void PlayDeathEnding() =>
+        finaleSequence = StartCoroutine(PlayEndingSequence(DeathEndingText, 3f, DeathEndingText));
+
+    private void PlaySecretEnding() =>
+        finaleSequence = StartCoroutine(PlayEndingSequence(currentNode.text, 2f,
+            "Вы были внимательны. В этот раз."));
+
+    private IEnumerator PlayEndingSequence(string finalText, float pauseSeconds, string creditsEpilogue)
+    {
+        isEnding = true;
+        dialoguePanel.SetActive(false);
+        SetContinuationVisible(false);
+        UpdateHistoryButtons();
+        endingText.text = finalText ?? string.Empty;
+        endingText.maxVisibleCharacters = 0;
+        endingTextFade.alpha = 1f;
+        endingText.gameObject.SetActive(true);
+        creditsText.gameObject.SetActive(false);
+        creditsPanel.SetActive(true);
+        endingText.ForceMeshUpdate();
+
+        int length = endingText.textInfo.characterCount;
+        float typed = 0f;
+        while (typed < length)
+        {
+            typed = Mathf.Min(length, typed + Time.unscaledDeltaTime * Mathf.Max(1f, charactersPerSecond));
+            endingText.maxVisibleCharacters = (int)typed;
+            yield return null;
+        }
+
+        yield return new WaitForSecondsRealtime(pauseSeconds);
+        float fadeStartedAt = Time.unscaledTime;
+        for (float elapsed = 0f; elapsed < EndingTextFadeSeconds; elapsed = Time.unscaledTime - fadeStartedAt)
+        {
+            endingTextFade.alpha = 1f - elapsed / EndingTextFadeSeconds;
+            yield return null;
+        }
+
+        endingTextFade.alpha = 0f;
+        endingText.gameObject.SetActive(false);
+        creditsText.text = $"{creditsContent}\n\n---\n\n{creditsEpilogue}\n\n---\n\nСпасибо за игру!";
+        creditsText.gameObject.SetActive(true);
+        RectTransform creditsRect = creditsText.rectTransform;
+        float panelHeight = ((RectTransform)creditsPanel.transform).rect.height;
+        float textHeight = Mathf.Max(1f, creditsText.preferredHeight);
+        creditsRect.sizeDelta = new Vector2(creditsRect.sizeDelta.x, textHeight);
+        creditsRect.anchoredPosition = new Vector2(0f, -40f);
+        float distance = panelHeight + textHeight + 80f;
+        for (float travelled = 0f; travelled < distance; travelled += Time.unscaledDeltaTime * CreditsScrollSpeed)
+        {
+            creditsRect.anchoredPosition = new Vector2(0f, travelled - 40f);
+            yield return null;
+        }
+
+        creditsText.gameObject.SetActive(false);
+        finaleSequence = null;
+    }
+
+    private void ResetFinalePresentation()
+    {
+        if (finaleSequence != null)
+        {
+            StopCoroutine(finaleSequence);
+            finaleSequence = null;
+        }
+
+        if (isFalling)
+            cameraShake.StopShake();
+        isFalling = false;
+        isEnding = false;
+        characterRect.anchoredPosition = characterRestPosition;
+        wetSignButton.interactable = false;
+        wetSignButton.gameObject.SetActive(false);
+        creditsPanel.SetActive(false);
     }
 
     private IEnumerator PlayGameOverSequence()
@@ -425,6 +588,9 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        if (isEnding)
+            return;
+
         if (visibleCharacters < lineLength)
         {
             float speed = Mathf.Max(1f, charactersPerSecond);
@@ -454,6 +620,16 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void ShowActions()
     {
+        if (isFalling || isEnding)
+            return;
+
+        if (currentNode.id == "finale_3")
+        {
+            wetSignButton.interactable = true;
+            SetContinuationVisible(true);
+            return;
+        }
+
         if (currentNode.choices == null || currentNode.choices.Length == 0)
         {
             bool hasNext = CanGoForward || HasTarget(currentNode.nextNodeId);
@@ -562,7 +738,8 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void Advance()
     {
-        if (!isActiveAndEnabled || !advanceArea.isActiveAndEnabled || !advanceArea.interactable)
+        if (!isActiveAndEnabled || isFalling || isEnding ||
+            !advanceArea.isActiveAndEnabled || !advanceArea.interactable)
             return;
 
         AdvanceToNextNode();
@@ -570,7 +747,9 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void AdvanceToNextNode()
     {
-        if (CanGoForward)
+        if (currentNode.id == "finale_3")
+            ShowNode("ending_death_1");
+        else if (CanGoForward)
             GoForward();
         else
             ShowNode(currentNode.nextNodeId);
@@ -589,7 +768,7 @@ public sealed class DialogueManager : MonoBehaviour
     private void MoveInHistory(int offset)
     {
         int target = historyIndex + offset;
-        if (!isActiveAndEnabled || IsRetryNode || target < 0 || target >= history.Count)
+        if (!isActiveAndEnabled || IsRetryNode || isFalling || isEnding || target < 0 || target >= history.Count)
             return;
 
         historyIndex = target;
@@ -609,5 +788,7 @@ public sealed class DialogueManager : MonoBehaviour
             forwardButton.onClick.RemoveListener(GoForward);
         if (retryButton != null)
             retryButton.onClick.RemoveListener(Retry);
+        if (wetSignButton != null)
+            wetSignButton.onClick.RemoveListener(ChooseSecretEnding);
     }
 }

@@ -1973,12 +1973,74 @@
     {
       "id": "finale_1",
       "characterName": "",
-      "text": "",
-      "background": "bg_eduard_office_neutral",
-      "characterSprite": "eduard_neutral",
+      "text": "Ну, кажется, всё получилось — меня можно назвать молодцом.",
+      "background": "bg_corridor_dry",
+      "characterSprite": "slava_office_relief",
+      "nextNodeId": "finale_2",
+      "choices": []
+    },
+    {
+      "id": "finale_2",
+      "characterName": "",
+      "text": "Всё, свобода. Сейчас выйду на улицу, поймаю такси, и этот безумный день наконец-то закончится...",
+      "background": "bg_corridor_dry",
+      "characterSprite": "",
+      "nextNodeId": "finale_3",
+      "choices": []
+    },
+    {
+      "id": "finale_3",
+      "characterName": "",
+      "text": "Можно выдохнуть и спокойно идти к выходу...",
+      "background": "bg_corridor_wet",
+      "characterSprite": "",
       "nextNodeId": "",
-      "choices": [],
-      "useEduardAtmosphere": true
+      "choices": []
+    },
+    {
+      "id": "ending_death_1",
+      "characterName": "",
+      "text": "Пол был мокрый.",
+      "background": "bg_corridor_wet",
+      "characterSprite": "slava_office_falling",
+      "nextNodeId": "ending_death_2",
+      "choices": []
+    },
+    {
+      "id": "ending_death_2",
+      "characterName": "",
+      "text": "",
+      "background": "black",
+      "characterSprite": "",
+      "nextNodeId": "",
+      "choices": []
+    },
+    {
+      "id": "ending_secret_1",
+      "characterName": "",
+      "text": "Осторожно. Помыто.",
+      "background": "bg_corridor_wet",
+      "characterSprite": "",
+      "nextNodeId": "ending_secret_2",
+      "choices": []
+    },
+    {
+      "id": "ending_secret_2",
+      "characterName": "",
+      "text": "Собеседование пройдено. Жизнь налаживается.",
+      "background": "bg_street",
+      "characterSprite": "slava_office_smirk",
+      "nextNodeId": "ending_secret_3",
+      "choices": []
+    },
+    {
+      "id": "ending_secret_3",
+      "characterName": "",
+      "text": "Наверное.",
+      "background": "bg_street",
+      "characterSprite": "slava_office_smirk",
+      "nextNodeId": "",
+      "choices": []
     }
   ]
 }

@@ -105,6 +105,20 @@ public static class SceneBuilder
         choiceSize.preferredHeight = 66f;
         choiceTemplate.gameObject.SetActive(false);
 
+        Image wetSignImage = CreateImage(canvas, "WetSignButton", Color.white);
+        wetSignImage.sprite = Resources.Load<Sprite>("Backgrounds/ui_wet_floor_sign");
+        wetSignImage.preserveAspect = true;
+        wetSignImage.raycastTarget = true;
+        RectTransform wetSignRect = wetSignImage.rectTransform;
+        wetSignRect.anchorMin = wetSignRect.anchorMax = wetSignRect.pivot = Vector2.zero;
+        wetSignRect.anchoredPosition = new Vector2(30f, 330f);
+        wetSignRect.sizeDelta = new Vector2(200f, 260f);
+        var wetSign = wetSignImage.gameObject.AddComponent<Button>();
+        wetSign.targetGraphic = wetSignImage;
+        wetSign.navigation = new Navigation { mode = Navigation.Mode.None };
+        wetSign.interactable = false;
+        wetSign.gameObject.SetActive(false);
+
         Image baton = CreateImage(canvas, "Baton Impact", Color.white);
         baton.preserveAspect = true;
         baton.gameObject.SetActive(false);
@@ -136,6 +150,29 @@ public static class SceneBuilder
         retryFade.blocksRaycasts = false;
         gameOverPanel.gameObject.SetActive(false);
 
+        Image creditsPanel = CreateImage(canvas, "CreditsPanel", Color.black);
+        creditsPanel.raycastTarget = true;
+        SetRect(creditsPanel.rectTransform, 0f, 0f, 1f, 1f);
+        creditsPanel.gameObject.AddComponent<RectMask2D>();
+
+        TextMeshProUGUI endingText = CreateText(creditsPanel.rectTransform, "Ending Text", font, 72f);
+        endingText.fontSizeMin = 48f;
+        endingText.alignment = TextAlignmentOptions.Center;
+        SetRect(endingText.rectTransform, 0.10f, 0.28f, 0.90f, 0.72f);
+        var endingTextFade = endingText.gameObject.AddComponent<CanvasGroup>();
+
+        TextMeshProUGUI creditsText = CreateText(creditsPanel.rectTransform, "Scrolling Credits", font, 48f);
+        creditsText.enableAutoSizing = false;
+        creditsText.alignment = TextAlignmentOptions.Top;
+        creditsText.lineSpacing = 20f;
+        RectTransform creditsRect = creditsText.rectTransform;
+        creditsRect.anchorMin = creditsRect.anchorMax = new Vector2(0.5f, 0f);
+        creditsRect.pivot = new Vector2(0.5f, 1f);
+        creditsRect.sizeDelta = new Vector2(1536f, 1080f);
+        creditsRect.anchoredPosition = new Vector2(0f, -40f);
+        creditsText.gameObject.SetActive(false);
+        creditsPanel.gameObject.SetActive(false);
+
         var systems = new GameObject("VN Systems");
         systems.AddComponent<VisualManager>().Configure(background, character, characterTrims);
         var manager = systems.AddComponent<DialogueManager>();
@@ -144,6 +181,8 @@ public static class SceneBuilder
         manager.ConfigureGameOver(gameOverPanel.gameObject, baton, blackoutFade, titleFade, retry, retryFade, cameraShake);
         manager.ConfigureMusic(CreateMusicSource(systems.transform, "MusicNeutral"),
             CreateMusicSource(systems.transform, "MusicTense"), CreateMusicSource(systems.transform, "MusicHorror"));
+        manager.ConfigureFinale(wetSign, creditsPanel.gameObject, endingText, endingTextFade,
+            creditsText, characterRect);
 
         if (!EditorSceneManager.SaveScene(scene, ScenePath))
         {
