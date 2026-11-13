@@ -77,8 +77,8 @@ public static class SceneBuilder
         dialogue.alignment = TextAlignmentOptions.TopLeft;
         SetRect(dialogue.rectTransform, 0.03f, 0.17f, 0.97f, 0.74f);
 
-        Button back = CreateHistoryButton(panel.rectTransform, "Back Button", '◀', font, false);
-        Button forward = CreateHistoryButton(panel.rectTransform, "Forward Button", '▶', font, true);
+        Button back = CreateHistoryButton(panel.rectTransform, "Back Button", false);
+        Button forward = CreateHistoryButton(panel.rectTransform, "Forward Button", true);
 
         Image continueIndicator = CreateImage(panel.rectTransform, "Continue Indicator", Color.white);
         RectTransform indicatorRect = continueIndicator.rectTransform;
@@ -105,16 +105,46 @@ public static class SceneBuilder
         choiceSize.preferredHeight = 66f;
         choiceTemplate.gameObject.SetActive(false);
 
-        Image wetSignImage = CreateImage(canvas, "WetSignButton", Color.white);
+        Image elevatorImage = CreateImage(canvas, "GoToElevatorButton", new Color(0.03f, 0.045f, 0.07f, 0.7f));
+        elevatorImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        elevatorImage.type = Image.Type.Sliced;
+        elevatorImage.pixelsPerUnitMultiplier = 2f;
+        elevatorImage.raycastTarget = true;
+        RectTransform elevatorRect = elevatorImage.rectTransform;
+        elevatorRect.anchorMin = elevatorRect.anchorMax = new Vector2(0.5f, 0.5f);
+        elevatorRect.anchoredPosition = Vector2.zero;
+        elevatorRect.sizeDelta = new Vector2(400f, 100f);
+        var goToElevator = elevatorImage.gameObject.AddComponent<Button>();
+        goToElevator.targetGraphic = elevatorImage;
+        goToElevator.navigation = new Navigation { mode = Navigation.Mode.None };
+        Image elevatorBorder = CreateImage(elevatorRect, "Outline", new Color(1f, 1f, 1f, 0.65f));
+        elevatorBorder.sprite = elevatorImage.sprite;
+        elevatorBorder.type = Image.Type.Sliced;
+        elevatorBorder.pixelsPerUnitMultiplier = 2f;
+        elevatorBorder.fillCenter = false;
+        SetRect(elevatorBorder.rectTransform, 0f, 0f, 1f, 1f);
+        var elevatorOutline = elevatorBorder.gameObject.AddComponent<Outline>();
+        elevatorOutline.effectColor = new Color(1f, 1f, 1f, 0.65f);
+        elevatorOutline.effectDistance = new Vector2(0.5f, -0.5f);
+        elevatorOutline.useGraphicAlpha = false;
+        TextMeshProUGUI elevatorLabel = CreateText(elevatorRect, "Label", font, 40f);
+        elevatorLabel.text = "Иди к лифту";
+        elevatorLabel.alignment = TextAlignmentOptions.Center;
+        SetRect(elevatorLabel.rectTransform, 0f, 0f, 1f, 1f);
+        goToElevator.gameObject.SetActive(false);
+
+        Image wetSignImage = CreateImage(canvas, "WetSignButton", new Color32(80, 80, 80, 255));
         wetSignImage.sprite = Resources.Load<Sprite>("Backgrounds/ui_wet_floor_sign");
         wetSignImage.preserveAspect = true;
         wetSignImage.raycastTarget = true;
         RectTransform wetSignRect = wetSignImage.rectTransform;
-        wetSignRect.anchorMin = wetSignRect.anchorMax = wetSignRect.pivot = Vector2.zero;
-        wetSignRect.anchoredPosition = new Vector2(30f, 330f);
-        wetSignRect.sizeDelta = new Vector2(200f, 260f);
+        wetSignRect.anchorMin = wetSignRect.anchorMax = Vector2.zero;
+        wetSignRect.pivot = new Vector2(0.5f, 0f);
+        wetSignRect.anchoredPosition = new Vector2(250f, 50f);
+        wetSignRect.sizeDelta = new Vector2(120f, 160f);
         var wetSign = wetSignImage.gameObject.AddComponent<Button>();
         wetSign.targetGraphic = wetSignImage;
+        wetSign.transition = Selectable.Transition.None;
         wetSign.navigation = new Navigation { mode = Navigation.Mode.None };
         wetSign.interactable = false;
         wetSign.gameObject.SetActive(false);
@@ -171,6 +201,8 @@ public static class SceneBuilder
         creditsRect.sizeDelta = new Vector2(1536f, 1080f);
         creditsRect.anchoredPosition = new Vector2(0f, -40f);
         creditsText.gameObject.SetActive(false);
+        Button creditsBack = CreateHistoryButton(creditsPanel.rectTransform, "Credits Back Button", false);
+        ((RectTransform)creditsBack.transform).anchoredPosition = new Vector2(135f, 60f);
         creditsPanel.gameObject.SetActive(false);
 
         var systems = new GameObject("VN Systems");
@@ -182,7 +214,7 @@ public static class SceneBuilder
         manager.ConfigureMusic(CreateMusicSource(systems.transform, "MusicNeutral"),
             CreateMusicSource(systems.transform, "MusicTense"), CreateMusicSource(systems.transform, "MusicHorror"));
         manager.ConfigureFinale(wetSign, creditsPanel.gameObject, endingText, endingTextFade,
-            creditsText, characterRect);
+            creditsText, characterRect, goToElevator, creditsBack);
 
         if (!EditorSceneManager.SaveScene(scene, ScenePath))
         {
@@ -336,8 +368,7 @@ public static class SceneBuilder
         return button;
     }
 
-    private static Button CreateHistoryButton(Transform parent, string name, char glyph,
-        TMP_FontAsset font, bool onRight)
+    private static Button CreateHistoryButton(Transform parent, string name, bool onRight)
     {
         Image hitArea = CreateImage(parent, name, Color.clear);
         hitArea.raycastTarget = true;
@@ -346,12 +377,10 @@ public static class SceneBuilder
         rect.anchoredPosition = new Vector2(onRight ? -49f : 49f, 27f);
         rect.sizeDelta = new Vector2(66f, 44f);
 
-        TextMeshProUGUI arrow = CreateText(rect, "Arrow", font, 32f);
-        if (!font.HasCharacter(glyph, true, true))
-            glyph = onRight ? '►' : '◄';
-        arrow.text = glyph.ToString();
-        arrow.alignment = TextAlignmentOptions.Center;
-        SetRect(arrow.rectTransform, 0f, 0f, 1f, 1f);
+        var arrow = CreateRect(rect, "Arrow").gameObject.AddComponent<HistoryArrowGraphic>();
+        arrow.raycastTarget = false;
+        arrow.rectTransform.sizeDelta = new Vector2(20f, 22f);
+        arrow.rectTransform.localRotation = Quaternion.Euler(0f, 0f, onRight ? 0f : 180f);
 
         var button = hitArea.gameObject.AddComponent<Button>();
         button.targetGraphic = arrow;
