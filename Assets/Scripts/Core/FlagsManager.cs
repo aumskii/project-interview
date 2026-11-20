@@ -52,7 +52,7 @@ public sealed class FlagsManager
             (choiceFlagCounts.TryGetValue(flag, out int count) && count > removedChoices));
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForPlaySession()
+    public static void ResetAllFlags()
     {
         Instance.flags.Clear();
         Instance.choiceFlagCounts.Clear();

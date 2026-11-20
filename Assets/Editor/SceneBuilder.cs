@@ -15,7 +15,7 @@ using UnityEngine.InputSystem.UI;
 public static class SceneBuilder
 {
     private const string MenuPath = "Tools/Build VN Scene";
-    private const string ScenePath = "Assets/VNScene.unity";
+    internal const string ScenePath = "Assets/VNScene.unity";
     private const byte VisibleAlphaThreshold = 16;
 
     [MenuItem(MenuPath, true)]
@@ -39,14 +39,8 @@ public static class SceneBuilder
         CameraShake cameraShake = CreateCamera();
         CreateEventSystem();
 
-        var canvasObject = new GameObject("VN Canvas", typeof(RectTransform), typeof(Canvas),
-            typeof(CanvasScaler), typeof(GraphicRaycaster));
-        canvasObject.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-        var canvas = (RectTransform)canvasObject.transform;
+        CanvasScaler scaler = CreateCanvas("VN Canvas");
+        var canvas = (RectTransform)scaler.transform;
 
         Image background = CreateImage(canvas, "Background", Color.black);
         SetRect(background.rectTransform, 0f, 0f, 1f, 1f);
@@ -314,7 +308,19 @@ public static class SceneBuilder
         return cameraObject.GetComponent<CameraShake>();
     }
 
-    private static void CreateEventSystem()
+    internal static CanvasScaler CreateCanvas(string name)
+    {
+        var canvasObject = new GameObject(name, typeof(RectTransform), typeof(Canvas),
+            typeof(CanvasScaler), typeof(GraphicRaycaster));
+        canvasObject.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.matchWidthOrHeight = 0.5f;
+        return scaler;
+    }
+
+    internal static EventSystem CreateEventSystem()
     {
         var events = new GameObject("EventSystem", typeof(EventSystem));
 #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
@@ -322,6 +328,7 @@ public static class SceneBuilder
 #else
         events.AddComponent<StandaloneInputModule>();
 #endif
+        return events.GetComponent<EventSystem>();
     }
 
     private static RectTransform CreateRect(Transform parent, string name)
@@ -331,7 +338,7 @@ public static class SceneBuilder
         return rect;
     }
 
-    private static Image CreateImage(Transform parent, string name, Color color)
+    internal static Image CreateImage(Transform parent, string name, Color color)
     {
         var image = CreateRect(parent, name).gameObject.AddComponent<Image>();
         image.color = color;
@@ -339,7 +346,7 @@ public static class SceneBuilder
         return image;
     }
 
-    private static TextMeshProUGUI CreateText(Transform parent, string name, TMP_FontAsset font, float size)
+    internal static TextMeshProUGUI CreateText(Transform parent, string name, TMP_FontAsset font, float size)
     {
         var text = CreateRect(parent, name).gameObject.AddComponent<TextMeshProUGUI>();
         text.font = font;
@@ -418,7 +425,7 @@ public static class SceneBuilder
         return button;
     }
 
-    private static void SetRect(RectTransform rect, float left, float bottom, float right, float top)
+    internal static void SetRect(RectTransform rect, float left, float bottom, float right, float top)
     {
         rect.anchorMin = new Vector2(left, bottom);
         rect.anchorMax = new Vector2(right, top);

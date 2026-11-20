@@ -172,6 +172,7 @@ public sealed class DialogueManager : MonoBehaviour
             return;
         }
 
+        FlagsManager.ResetAllFlags();
         advanceArea.onClick.AddListener(Advance);
         backButton.onClick.AddListener(GoBack);
         forwardButton.onClick.AddListener(GoForward);
