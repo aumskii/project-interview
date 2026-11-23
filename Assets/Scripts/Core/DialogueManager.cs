@@ -30,14 +30,9 @@ public sealed class DialogueManager : MonoBehaviour
     private const int EduardMistakeLimit = 3;
     private const string EduardGameOverNodeId = "eduard_game_over";
 
-    private static readonly string[] EduardBackgrounds =
-    {
-        "bg_eduard_office_neutral", "bg_eduard_office_interested",
-        "bg_eduard_office_angry", "bg_eduard_office_demon",
-    };
     private static readonly string[] EduardPortraits =
     {
-        "eduard_neutral", "eduard_smiling", "eduard_angry", "eduard_demon",
+        "eduard_neutral", "eduard_interested", "eduard_angry", "eduard_neutral",
     };
 
     private readonly struct HistoryEntry
@@ -414,7 +409,7 @@ public sealed class DialogueManager : MonoBehaviour
         int officeMood = node.useEduardAtmosphere
             ? Mathf.Clamp(MistakeCountAt(history.Count), 0, EduardMistakeLimit)
             : 0;
-        visuals.SetBackground(node.useEduardAtmosphere ? EduardBackgrounds[officeMood] : node.background);
+        visuals.SetBackground(node.background);
         UpdateMusic(node.useEduardAtmosphere, officeMood);
         if (IsRetryNode)
         {
