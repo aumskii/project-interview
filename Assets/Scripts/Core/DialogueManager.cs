@@ -368,9 +368,7 @@ public sealed class DialogueManager : MonoBehaviour
             visuals.SetCharacterSprite(null);
             lineLength = 0;
             visibleCharacters = 0f;
-            backButton.interactable = false;
-            forwardButton.interactable = false;
-            forwardButton.gameObject.SetActive(false);
+            UpdateHistoryButtons();
             gameOverSequence = StartCoroutine(PlayGameOverSequence());
             return;
         }
@@ -428,11 +426,12 @@ public sealed class DialogueManager : MonoBehaviour
 
     private void UpdateHistoryButtons()
     {
-        bool canNavigate = !isFalling && !isEnding && currentNode?.id != "finale_3";
-        backButton.interactable = historyIndex > 0 && canNavigate;
-        bool canGoForward = CanGoForward && canNavigate;
+        bool showNavigation = currentNode != null && !IsRetryNode && !isFalling && !isEnding && currentNode.id != "finale_3";
+        backButton.interactable = showNavigation && historyIndex > 0;
+        backButton.gameObject.SetActive(showNavigation);
+        bool canGoForward = showNavigation && CanGoForward;
         forwardButton.interactable = canGoForward;
-        forwardButton.gameObject.SetActive(canGoForward);
+        forwardButton.gameObject.SetActive(showNavigation && (canGoForward || choiceButtons.Count > 0));
     }
 
     private IEnumerator PulseElevatorButton()
@@ -466,7 +465,6 @@ public sealed class DialogueManager : MonoBehaviour
         dialogueText.text = currentNode.text ?? string.Empty;
         dialogueText.maxVisibleCharacters = int.MaxValue;
         dialoguePanel.SetActive(true);
-        backButton.gameObject.SetActive(false);
         yield return new WaitForSecondsRealtime(FallCaptionSeconds);
 
         isFalling = false;
@@ -565,7 +563,6 @@ public sealed class DialogueManager : MonoBehaviour
             cameraShake.StopShake();
         isFalling = false;
         isEnding = false;
-        backButton.gameObject.SetActive(true);
         creditsBackButton.interactable = false;
         characterRect.anchoredPosition = characterRestPosition;
         wetSignButton.interactable = false;
@@ -719,6 +716,13 @@ public sealed class DialogueManager : MonoBehaviour
 
             choiceButtons.Add(button);
             button.gameObject.SetActive(true);
+        }
+
+        if (choiceButtons.Count > 0)
+        {
+            SetContinuationVisible(false);
+            dialoguePanel.SetActive(false);
+            UpdateHistoryButtons();
         }
     }
 

@@ -71,8 +71,9 @@ public static class SceneBuilder
         dialogue.alignment = TextAlignmentOptions.TopLeft;
         SetRect(dialogue.rectTransform, 0.03f, 0.17f, 0.97f, 0.74f);
 
-        Button back = CreateHistoryButton(panel.rectTransform, "Back Button", false);
-        Button forward = CreateHistoryButton(panel.rectTransform, "Forward Button", true);
+        Button back = CreateHistoryButton(canvas, "Back Button", false, panel.rectTransform.anchorMin);
+        var forwardAnchor = new Vector2(panel.rectTransform.anchorMax.x, panel.rectTransform.anchorMin.y);
+        Button forward = CreateHistoryButton(canvas, "Forward Button", true, forwardAnchor);
 
         Image continueIndicator = CreateImage(panel.rectTransform, "Continue Indicator", Color.white);
         RectTransform indicatorRect = continueIndicator.rectTransform;
@@ -195,7 +196,7 @@ public static class SceneBuilder
         creditsRect.sizeDelta = new Vector2(1536f, 1080f);
         creditsRect.anchoredPosition = new Vector2(0f, -40f);
         creditsText.gameObject.SetActive(false);
-        Button creditsBack = CreateHistoryButton(creditsPanel.rectTransform, "Credits Back Button", false);
+        Button creditsBack = CreateHistoryButton(creditsPanel.rectTransform, "Credits Back Button", false, Vector2.zero);
         ((RectTransform)creditsBack.transform).anchoredPosition = new Vector2(135f, 60f);
         creditsPanel.gameObject.SetActive(false);
 
@@ -375,12 +376,12 @@ public static class SceneBuilder
         return button;
     }
 
-    private static Button CreateHistoryButton(Transform parent, string name, bool onRight)
+    private static Button CreateHistoryButton(Transform parent, string name, bool onRight, Vector2 anchor)
     {
         Image hitArea = CreateImage(parent, name, Color.clear);
         hitArea.raycastTarget = true;
         RectTransform rect = hitArea.rectTransform;
-        rect.anchorMin = rect.anchorMax = onRight ? Vector2.right : Vector2.zero;
+        rect.anchorMin = rect.anchorMax = anchor;
         rect.anchoredPosition = new Vector2(onRight ? -49f : 49f, 27f);
         rect.sizeDelta = new Vector2(66f, 44f);
 
