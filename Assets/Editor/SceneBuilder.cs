@@ -135,7 +135,7 @@ public static class SceneBuilder
         RectTransform wetSignRect = wetSignImage.rectTransform;
         wetSignRect.anchorMin = wetSignRect.anchorMax = Vector2.zero;
         wetSignRect.pivot = new Vector2(0.5f, 0f);
-        wetSignRect.anchoredPosition = new Vector2(250f, 50f);
+        wetSignRect.anchoredPosition = new Vector2(292.2f, 9f);
         wetSignRect.sizeDelta = new Vector2(120f, 160f);
         var wetSign = wetSignImage.gameObject.AddComponent<Button>();
         wetSign.targetGraphic = wetSignImage;
