@@ -2018,7 +2018,7 @@
     {
       "id": "ending_secret_1",
       "characterName": "Слава",
-      "text": "Осторожно. Помыто.",
+      "text": "«Осторожно. Помыто»... Если я сейчас навернусь, Эдуард Эдуардович будет ржать надо мной даже с того света. Не дождется. Осторожненько...",
       "background": "bg_corridor_wet",
       "characterSprite": "",
       "nextNodeId": "ending_secret_2",
