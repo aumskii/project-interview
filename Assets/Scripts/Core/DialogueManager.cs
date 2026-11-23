@@ -40,6 +40,25 @@ public sealed class DialogueManager : MonoBehaviour
         "eduard_neutral", "eduard_smiling", "eduard_angry", "eduard_demon",
     };
 
+    private readonly struct HistoryEntry
+    {
+        public readonly string NodeId;
+        public readonly string ChoiceFlag;
+        public readonly bool AddsMistake;
+        public readonly bool HasChoiceStep;
+
+        public HistoryEntry(string nodeId, string choiceFlag, bool addsMistake, bool hasChoiceStep = false)
+        {
+            NodeId = nodeId;
+            ChoiceFlag = choiceFlag;
+            AddsMistake = addsMistake;
+            HasChoiceStep = hasChoiceStep;
+        }
+
+        public HistoryEntry WithChoiceStep(bool hasChoiceStep) =>
+            new HistoryEntry(NodeId, ChoiceFlag, AddsMistake, hasChoiceStep);
+    }
+
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private TMP_Text speakerText;
     [SerializeField] private TMP_Text dialogueText;
@@ -78,8 +97,9 @@ public sealed class DialogueManager : MonoBehaviour
     private readonly Dictionary<string, DialogueNode> nodes =
         new Dictionary<string, DialogueNode>(StringComparer.Ordinal);
     private readonly List<Button> choiceButtons = new List<Button>();
-    private readonly List<(DialogueNode Node, string ChoiceFlag, bool AddsMistake)> history =
-        new List<(DialogueNode Node, string ChoiceFlag, bool AddsMistake)>();
+    // The displayed entry is stored separately from the past and future.
+    private readonly List<HistoryEntry> history = new List<HistoryEntry>();
+    private readonly List<HistoryEntry> forwardHistory = new List<HistoryEntry>();
 
     private VisualManager visuals;
     private AudioSource currentMusic;
@@ -89,14 +109,22 @@ public sealed class DialogueManager : MonoBehaviour
     private bool isFalling;
     private bool isEnding;
     private DialogueNode currentNode;
-    private int historyIndex = -1;
+    private HistoryEntry currentEntry;
+    private int lastHistoryNavigationFrame = -1;
     private int lineLength;
     private float visibleCharacters;
     private float indicatorStartedAt;
     private float? autoAdvanceAt;
 
-    private bool CanGoForward => historyIndex < history.Count - 1;
+    private bool IsShowingChoices => choiceButtons.Count > 0;
+    private bool HasChoiceStepAhead => currentEntry.HasChoiceStep && !IsShowingChoices;
+    private bool CanGoBack => IsShowingChoices || history.Count > 0;
+    private bool CanGoForward => HasChoiceStepAhead || forwardHistory.Count > 0;
+    private bool CanNavigateHistory =>
+        currentNode != null && !IsRetryNode && !isFalling && !isEnding && currentNode.id != "finale_3";
     private bool IsRetryNode => !string.IsNullOrWhiteSpace(currentNode?.retryNodeId);
+    private bool HasChoices => currentNode?.choices?.Length > 0;
+    private bool IsTyping => visibleCharacters < lineLength;
 
     public void Configure(GameObject panel, TMP_Text speaker, TMP_Text line, RectTransform choices,
         Button choiceTemplate, Button advance, Image indicator, Button back, Button forward)
@@ -230,36 +258,43 @@ public sealed class DialogueManager : MonoBehaviour
 
     public void RestartFromNode(string nodeId)
     {
-        int checkpointIndex = history.FindLastIndex(historyIndex, entry => entry.Node.id == nodeId);
+        int checkpointIndex = currentEntry.NodeId == nodeId
+            ? history.Count
+            : history.FindLastIndex(entry => entry.NodeId == nodeId);
         if (!TryResolveNode(nodeId, checkpointIndex, null, false, out DialogueNode node))
             return;
 
-        historyIndex = checkpointIndex;
-        DiscardForwardHistory();
-        if (checkpointIndex >= 0 && history[checkpointIndex].Node == node)
-            DisplayNode(node, showImmediately: false);
+        DiscardHistoryAfter(checkpointIndex);
+        if (currentEntry.NodeId == node.id)
+        {
+            currentEntry = currentEntry.WithChoiceStep(false);
+            DisplayNode(node);
+        }
         else
             EnterNode(node, null, false);
     }
 
     private void VisitNode(string nodeId, string choiceFlag, bool addsMistake = false)
     {
-        if (!TryResolveNode(nodeId, historyIndex, choiceFlag, addsMistake, out DialogueNode node))
+        if (!TryResolveNode(nodeId, history.Count, choiceFlag, addsMistake, out DialogueNode node))
             return;
 
-        DiscardForwardHistory();
+        DiscardHistoryAfter(history.Count);
+        currentEntry = currentEntry.WithChoiceStep(IsShowingChoices);
         EnterNode(node, choiceFlag, addsMistake);
     }
 
     private void EnterNode(DialogueNode node, string choiceFlag, bool addsMistake)
     {
+        if (currentEntry.NodeId != null)
+            history.Add(currentEntry);
+
         FlagsManager.Instance.AddChoiceFlag(choiceFlag);
         if (addsMistake)
             FlagsManager.Instance.AddMistake();
 
-        history.Add((node, choiceFlag, addsMistake));
-        historyIndex = history.Count - 1;
-        DisplayNode(node, showImmediately: false);
+        currentEntry = new HistoryEntry(node.id, choiceFlag, addsMistake);
+        DisplayNode(node);
     }
 
     private bool TryResolveNode(string nodeId, int lastKeptIndex, string choiceFlag, bool addsMistake, out DialogueNode node)
@@ -305,44 +340,62 @@ public sealed class DialogueManager : MonoBehaviour
     private bool HasFlagAt(string flag, int lastKeptIndex)
     {
         int discardedChoices = 0;
-        for (int i = lastKeptIndex + 1; i < history.Count; i++)
+        foreach (HistoryEntry entry in EntriesAfter(lastKeptIndex))
         {
-            if (history[i].ChoiceFlag == flag)
+            if (entry.ChoiceFlag == flag)
                 discardedChoices++;
         }
 
         return FlagsManager.Instance.HasFlagAfterRemovingChoices(flag, discardedChoices);
     }
 
-    private void DiscardForwardHistory()
+    private IEnumerable<HistoryEntry> EntriesAfter(int lastKeptIndex)
     {
-        if (!CanGoForward)
-            return;
+        // Saved future entries keep their flags until the player replaces that branch.
+        foreach (HistoryEntry entry in forwardHistory)
+            yield return entry;
 
-        int firstDiscarded = historyIndex + 1;
-        for (int i = firstDiscarded; i < history.Count; i++)
+        if (lastKeptIndex >= history.Count)
+            yield break;
+
+        if (currentEntry.NodeId != null)
+            yield return currentEntry;
+
+        for (int i = lastKeptIndex + 1; i < history.Count; i++)
+            yield return history[i];
+    }
+
+    private void DiscardHistoryAfter(int lastKeptIndex)
+    {
+        foreach (HistoryEntry entry in EntriesAfter(lastKeptIndex))
         {
-            FlagsManager.Instance.RemoveChoiceFlag(history[i].ChoiceFlag);
-            if (history[i].AddsMistake)
+            FlagsManager.Instance.RemoveChoiceFlag(entry.ChoiceFlag);
+            if (entry.AddsMistake)
                 FlagsManager.Instance.RemoveMistake();
         }
+        forwardHistory.Clear();
 
-        history.RemoveRange(firstDiscarded, history.Count - firstDiscarded);
+        if (lastKeptIndex < history.Count)
+        {
+            currentEntry = lastKeptIndex >= 0 ? history[lastKeptIndex] : default;
+            int firstRemoved = Math.Max(lastKeptIndex, 0);
+            history.RemoveRange(firstRemoved, history.Count - firstRemoved);
+        }
     }
 
     private int MistakeCountAt(int lastKeptIndex)
     {
         int count = FlagsManager.Instance.MistakeCount;
-        for (int i = lastKeptIndex + 1; i < history.Count; i++)
+        foreach (HistoryEntry entry in EntriesAfter(lastKeptIndex))
         {
-            if (history[i].AddsMistake)
+            if (entry.AddsMistake)
                 count--;
         }
 
         return count;
     }
 
-    private void DisplayNode(DialogueNode node, bool showImmediately)
+    private void DisplayNode(DialogueNode node, bool isHistoryNavigation = false, bool showChoiceStep = false)
     {
         autoAdvanceAt = null;
         ResetFinalePresentation();
@@ -359,7 +412,7 @@ public sealed class DialogueManager : MonoBehaviour
 
         currentNode = node;
         int officeMood = node.useEduardAtmosphere
-            ? Mathf.Clamp(MistakeCountAt(historyIndex), 0, EduardMistakeLimit)
+            ? Mathf.Clamp(MistakeCountAt(history.Count), 0, EduardMistakeLimit)
             : 0;
         visuals.SetBackground(node.useEduardAtmosphere ? EduardBackgrounds[officeMood] : node.background);
         UpdateMusic(node.useEduardAtmosphere, officeMood);
@@ -414,24 +467,28 @@ public sealed class DialogueManager : MonoBehaviour
         speakerText.text = node.characterName ?? string.Empty;
 
         dialogueText.text = node.text ?? string.Empty;
-        dialogueText.maxVisibleCharacters = showImmediately ? int.MaxValue : 0;
+        dialogueText.maxVisibleCharacters = isHistoryNavigation ? int.MaxValue : 0;
         dialogueText.ForceMeshUpdate();
         lineLength = dialogueText.textInfo.characterCount;
-        visibleCharacters = showImmediately ? lineLength : 0f;
+        visibleCharacters = isHistoryNavigation ? lineLength : 0f;
         UpdateHistoryButtons();
 
-        if (visibleCharacters >= lineLength)
-            ShowActions();
+        if (showChoiceStep && HasChoices)
+            ShowChoices();
+        else if (IsTyping)
+            advanceArea.gameObject.SetActive(true);
+        else
+            FinishLine();
     }
 
     private void UpdateHistoryButtons()
     {
-        bool showNavigation = currentNode != null && !IsRetryNode && !isFalling && !isEnding && currentNode.id != "finale_3";
-        backButton.interactable = showNavigation && historyIndex > 0;
+        bool showNavigation = CanNavigateHistory;
+        backButton.interactable = showNavigation && CanGoBack;
         backButton.gameObject.SetActive(showNavigation);
         bool canGoForward = showNavigation && CanGoForward;
         forwardButton.interactable = canGoForward;
-        forwardButton.gameObject.SetActive(showNavigation && (canGoForward || choiceButtons.Count > 0));
+        forwardButton.gameObject.SetActive(showNavigation && (canGoForward || IsShowingChoices));
     }
 
     private IEnumerator PulseElevatorButton()
@@ -657,14 +714,14 @@ public sealed class DialogueManager : MonoBehaviour
         if (isEnding)
             return;
 
-        if (visibleCharacters < lineLength)
+        if (IsTyping)
         {
             float speed = Mathf.Max(1f, charactersPerSecond);
             visibleCharacters = Mathf.Min(lineLength, visibleCharacters + Time.unscaledDeltaTime * speed);
-            dialogueText.maxVisibleCharacters = (int)visibleCharacters;
-
-            if (visibleCharacters >= lineLength)
-                ShowActions();
+            if (IsTyping)
+                dialogueText.maxVisibleCharacters = (int)visibleCharacters;
+            else
+                FinishLine();
             return;
         }
 
@@ -684,24 +741,25 @@ public sealed class DialogueManager : MonoBehaviour
         continueIndicator.color = color;
     }
 
-    private void ShowActions()
+    private void FinishLine()
     {
-        if (isFalling || isEnding || currentNode.id == "finale_3")
-            return;
+        visibleCharacters = lineLength;
+        dialogueText.maxVisibleCharacters = lineLength;
 
-        if (currentNode.choices == null || currentNode.choices.Length == 0)
+        bool hasChoices = HasChoices;
+        bool canContinue = hasChoices || CanGoForward || HasTarget(currentNode.nextNodeId);
+        if (!hasChoices && canContinue && currentNode.autoAdvanceDelaySeconds > 0f)
         {
-            bool hasNext = CanGoForward || HasTarget(currentNode.nextNodeId);
-            if (hasNext && currentNode.autoAdvanceDelaySeconds > 0f)
-            {
-                autoAdvanceAt = Time.unscaledTime + currentNode.autoAdvanceDelaySeconds;
-                return;
-            }
-
-            SetContinuationVisible(hasNext);
+            SetContinuationVisible(false);
+            autoAdvanceAt = Time.unscaledTime + currentNode.autoAdvanceDelaySeconds;
             return;
         }
 
+        SetContinuationVisible(canContinue);
+    }
+
+    private void ShowChoices()
+    {
         foreach (Choice choice in currentNode.choices)
         {
             if (choice == null)
@@ -712,22 +770,27 @@ public sealed class DialogueManager : MonoBehaviour
             button.interactable = HasTarget(choice.nextNodeId) &&
                 (string.IsNullOrWhiteSpace(choice.mismatchNodeId) || HasTarget(choice.mismatchNodeId));
             if (button.interactable)
-                button.onClick.AddListener(() => SelectChoice(choice));
+                button.onClick.AddListener(() => SelectChoice(button, choice));
 
             choiceButtons.Add(button);
             button.gameObject.SetActive(true);
         }
 
-        if (choiceButtons.Count > 0)
+        if (IsShowingChoices)
         {
+            currentEntry = currentEntry.WithChoiceStep(true);
             SetContinuationVisible(false);
             dialoguePanel.SetActive(false);
             UpdateHistoryButtons();
         }
     }
 
-    private void SelectChoice(Choice choice)
+    private void SelectChoice(Button button, Choice choice)
     {
+        if (!isActiveAndEnabled || !choiceButtons.Contains(button) || !button.isActiveAndEnabled ||
+            !button.IsInteractable())
+            return;
+
         if (string.IsNullOrWhiteSpace(choice.mismatchNodeId))
         {
             bool addsMistake = currentNode.useEduardAtmosphere && CountsAsMistake(choice);
@@ -735,7 +798,7 @@ public sealed class DialogueManager : MonoBehaviour
             return;
         }
 
-        bool matchesFlag = HasFlagAt(choice.flagToSet, historyIndex);
+        bool matchesFlag = HasFlagAt(choice.flagToSet, history.Count);
         string target = matchesFlag ? choice.nextNodeId : choice.mismatchNodeId;
         VisitNode(target, null, currentNode.useEduardAtmosphere && !matchesFlag);
     }
@@ -743,12 +806,12 @@ public sealed class DialogueManager : MonoBehaviour
     private bool CountsAsMistake(Choice choice)
     {
         if (choice.addsMistake || (!string.IsNullOrWhiteSpace(choice.mistakeUnlessFlag) &&
-            !HasFlagAt(choice.mistakeUnlessFlag, historyIndex)))
+            !HasFlagAt(choice.mistakeUnlessFlag, history.Count)))
             return true;
 
         foreach (string flag in choice.mistakeIfAnyFlags ?? Array.Empty<string>())
         {
-            if (HasFlagAt(flag, historyIndex))
+            if (HasFlagAt(flag, history.Count))
                 return true;
         }
 
@@ -808,6 +871,18 @@ public sealed class DialogueManager : MonoBehaviour
             !advanceArea.isActiveAndEnabled || !advanceArea.interactable)
             return;
 
+        if (IsTyping)
+        {
+            FinishLine();
+            return;
+        }
+
+        if (HasChoices)
+        {
+            ShowChoices();
+            return;
+        }
+
         AdvanceToNextNode();
     }
 
@@ -822,9 +897,27 @@ public sealed class DialogueManager : MonoBehaviour
             ShowNode(currentNode.nextNodeId);
     }
 
-    private void GoBack() => MoveInHistory(-1);
+    private void GoBack()
+    {
+        if (!CanGoBack || !BeginHistoryNavigation())
+            return;
 
-    private void GoForward() => MoveInHistory(1);
+        if (IsShowingChoices)
+            DisplayNode(currentNode, isHistoryNavigation: true);
+        else
+            MoveInHistory(history, forwardHistory, restoreLastStep: true);
+    }
+
+    private void GoForward()
+    {
+        if (!CanGoForward || !BeginHistoryNavigation())
+            return;
+
+        if (HasChoiceStepAhead)
+            ShowChoices();
+        else
+            MoveInHistory(forwardHistory, history, restoreLastStep: false);
+    }
 
     private void Retry()
     {
@@ -832,15 +925,24 @@ public sealed class DialogueManager : MonoBehaviour
             RestartFromNode(currentNode.retryNodeId);
     }
 
-    private void MoveInHistory(int offset)
+    private bool BeginHistoryNavigation()
     {
-        int target = historyIndex + offset;
-        if (!isActiveAndEnabled || IsRetryNode || isFalling || isEnding || currentNode?.id == "finale_3" ||
-            target < 0 || target >= history.Count)
-            return;
+        if (!isActiveAndEnabled || !CanNavigateHistory || lastHistoryNavigationFrame == Time.frameCount)
+            return false;
 
-        historyIndex = target;
-        DisplayNode(history[historyIndex].Node, showImmediately: true);
+        lastHistoryNavigationFrame = Time.frameCount;
+        return true;
+    }
+
+    private void MoveInHistory(List<HistoryEntry> from, List<HistoryEntry> to, bool restoreLastStep)
+    {
+        int last = from.Count - 1;
+        HistoryEntry target = from[last];
+        from.RemoveAt(last);
+        to.Add(currentEntry);
+        currentEntry = target;
+        DisplayNode(nodes[target.NodeId], isHistoryNavigation: true,
+            showChoiceStep: restoreLastStep && target.HasChoiceStep);
     }
 
     private void OnDestroy()
